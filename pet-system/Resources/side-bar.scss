@@ -1,0 +1,63 @@
+.container_side_menu{
+    min-height: 100%;
+    text-align: right;
+
+    width: 0;
+    position: fixed;
+    z-index: 1;
+    top:0;
+    left: 0;
+    background-color: #f7f7f7;
+    box-shadow: 4px 0px 8px rgba(49, 49, 49, 0.25);
+    box-sizing: border-box;
+
+    opacity: 0.9;
+    overflow-x: hidden;
+    padding-top: 60px;
+    transition:0.5s;
+
+    .size_icon_menu{
+        width: 23px;
+    }
+    
+    
+    .links_left_menu{
+        margin-right: 20px;
+        padding: 10px 10px 10px 30px;
+        text-decoration: none;
+        font-size: 22px;
+        color: rgb(77, 77, 77);
+        display: block;
+        line-height: 50px;
+        transition: 0.3s;
+        
+        &:hover{
+            color: rgb(0, 0, 0);
+            font-size: 27px;
+        }
+    }
+
+    
+    a{
+        padding: 10px 10px 10px 30px;
+        font-size: 22px;
+        color: rgb(83, 83, 83);
+        display: block;
+        transition: 0.3s;
+        text-decoration: none;
+        
+        &:hover{
+            display: block;
+            color: rgb(0, 0, 0);
+            font-size: 27px;
+        }
+    }
+
+    .buttons_side_menu{
+        position: absolute;
+        top:0;
+        right: 22px;
+        font-size: 36px;
+        margin-left: 50px;
+    }
+}

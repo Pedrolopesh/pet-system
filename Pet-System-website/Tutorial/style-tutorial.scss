@@ -1,0 +1,186 @@
+.bg-img-home{
+    background-image: url('../Resources/tutorial/fachada.png');
+}
+
+.bg-full-screen{
+    // background-image: url('../Resources/fachada-pet.png');
+    background-image: url('../Resources/tutorial/fachada.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    min-height: 668px;
+    max-width: 100%;
+    width: 100%;
+
+
+    @media screen and (max-width:700px) {
+        min-height: 44px;
+    }
+}
+
+.icon-header{
+    width: 160px;
+}
+
+.container-header{
+    max-width: 100%;
+    display: flex;
+}
+
+.container-title{
+    margin-left: 70px;
+    max-width: 50%;
+    display: block;
+    padding: 20px;
+    
+    @media screen and (max-width:700px) {
+        margin-left: 0px;
+        max-width: 100%;
+    }
+}
+
+
+.bg-mask-1{
+    background-color: rgba(0, 0, 0, 0.691);
+    max-width: 100%;
+    width: 100%;
+
+    @media screen and (max-width:700px) {
+        min-height: 30px;
+        max-width: 100%;
+    }
+}
+
+.bg-mask-2{
+    background-color: rgba(0, 0, 0, 0.5);
+    max-width: 100%;
+    width: 100%;
+    min-height: 500px;
+}
+
+.size-image-1{
+    width: 500px;
+
+    @media screen and (max-width:700px){
+        width: 190px;
+    }
+}
+
+.size-image-2{
+    width: 600px;
+
+    @media screen and (max-width:700px){
+        width: 190px;
+    }
+}
+
+.size-image-3{
+    width: 150px;
+
+    @media screen and (max-width:700px){
+        width: 190px;
+    }
+}
+
+.size-image-4{
+    width: 350px;
+
+    @media screen and (max-width:700px){
+        width: 190px;
+    }
+}
+
+.bg-full-screen-contact{
+    background-image: url('../Resources/sizes/08.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    min-height: 500px;
+}
+.container-image-contact{
+    max-width: 100%;
+
+}
+
+.container-form{
+    padding: 25px;
+}
+
+.input-form{
+    max-width: 100%;
+    width: 330px;
+}
+
+.input-form-text{
+    min-height: 100px;
+}
+.all-iframe{
+    max-width: 100%;
+    width: 100%;
+    min-height: 400px;
+
+}
+
+
+.iframe{
+    max-width: 80%;
+    
+    
+    iframe{
+        max-width: 80%;   
+
+        @media screen and (max-width:700px){
+            max-width: 100%;
+        }
+    }  
+    
+    @media screen and (max-width:700px){
+        max-width: 100%;
+    }
+}
+
+.container-foot{
+    display: block;
+    max-width: 100%;
+    width: 100%;
+}
+
+.container-foot-1{
+    display: block;
+    min-height: 300px;
+}
+
+.link-2{
+    padding: 10px;
+    line-height: 70px;
+    color: white;
+    text-decoration: none;
+    
+    &:hover{
+        color: white;
+    }
+}
+
+.icon-footer{
+    color: white;
+    width: 40px;
+
+    @media screen and (max-width:700px){
+        width: 30px;
+    }
+}
+
+.subtitle-picture{
+    line-height: 26px;
+}
+
+.margin-b-0{
+    margin-bottom: 0px !important;
+}
+
+.container-subtitle{
+    display: flex;
+    max-width: 100%;
+    
+    @media screen and (max-width:700px){
+        display: block;
+    }
+}

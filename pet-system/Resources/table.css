@@ -1,0 +1,267 @@
+.container-global-table {
+  display: block;
+  max-width: 70%;
+}
+
+.container-global-table .header-table {
+  padding: 10px;
+}
+
+@media screen and (max-width: 700px) {
+  .container-global-table {
+    overflow: overlay;
+  }
+}
+
+.container-global-table-1 {
+  display: block;
+  max-width: 60%;
+}
+
+.container-global-table-1 .header-table-1 {
+  padding: 10px;
+}
+
+.container-global-table-2 {
+  display: block;
+  max-width: 39%;
+}
+
+.container-global-table-2 .header-table-1 {
+  padding: 10px;
+}
+
+@media screen and (max-width: 700px) {
+  .container-global-table-2 {
+    max-width: 100%;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
+  }
+}
+
+.container-global-table-3 {
+  display: block;
+  max-width: 69%;
+}
+
+.container-global-table-3 .header-table-1 {
+  padding: 10px;
+}
+
+@media screen and (max-width: 700px) {
+  .container-global-table-3 {
+    margin-top: 50px;
+    max-width: 100%;
+  }
+}
+
+.container-global-table-4 {
+  display: block;
+  max-width: 59%;
+}
+
+.container-global-table-4 .header-table-1 {
+  padding: 10px;
+}
+
+@media screen and (max-width: 700px) {
+  .container-global-table-4 {
+    margin-top: 50px;
+    max-width: 100%;
+  }
+}
+
+.container-global-table-5 {
+  display: block;
+  max-width: 100%;
+}
+
+.container-global-table-5 .header-table-1 {
+  padding: 10px;
+}
+
+@media screen and (max-width: 700px) {
+  .container-global-table-5 {
+    margin-top: 50px;
+    max-width: 100%;
+  }
+}
+
+.box {
+  display: block !important;
+  height: 540px;
+  min-height: 100px !important;
+}
+
+.pagination-table {
+  border-top: 1px solid #c4c4c4;
+}
+
+.circle-primary {
+  width: 18px;
+  color: #007bff;
+}
+
+.circle-warning {
+  width: 18px;
+  color: #ffc107;
+}
+
+.circle-danger {
+  width: 18px;
+  color: #dc3545;
+}
+
+.table {
+  height: 46vh !important;
+  /* min-height: 3000px; */
+  overflow-x: scroll;
+}
+
+.table-purchase {
+  height: 69vh !important;
+  overflow-x: scroll;
+  /* min-height: 3000px; */
+}
+
+.table-datas {
+  height: 510px;
+  overflow-x: scroll;
+}
+
+.warning-tasks {
+  height: 350px;
+  overflow-x: scroll;
+}
+
+.warning-tasks-1 {
+  height: 265px;
+  overflow-x: scroll;
+}
+
+.info-table {
+  color: #4b4b4b;
+}
+
+.header-modal {
+  display: block;
+  max-width: 100%;
+}
+
+.modal_background {
+  position: fixed;
+  height: 100vh;
+  width: 100%;
+  background-color: rgba(24, 24, 24, 0.445);
+  top: 0;
+  left: 0;
+  overflow-y: auto;
+  padding-bottom: 40px;
+}
+
+.modal_background .modal_block {
+  border-radius: 6px;
+  display: block;
+  min-height: 420px;
+  width: 65%;
+  max-width: 1300px;
+  background-color: #f7f7f7;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 40px;
+}
+
+@media screen and (max-width: 700px) {
+  .modal_background .modal_block {
+    min-height: 360px;
+    width: 95%;
+  }
+}
+
+.modal_showing {
+  display: block;
+}
+
+.modal_hiding {
+  display: none;
+}
+
+.subtitle-modal {
+  font-size: 20px;
+}
+
+@media screen and (max-width: 700px) {
+  .subtitle-modal {
+    max-width: 100%;
+    font-size: 14px;
+  }
+}
+
+.icon-header-modal {
+  margin-left: auto;
+}
+
+@media screen and (max-width: 700px) {
+  .icon-header-modal {
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+.container-b {
+  display: block;
+  min-height: 350px;
+}
+
+.container-b-1 {
+  display: block;
+  min-height: 265px;
+}
+
+.container-box {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  max-width: 1190px;
+}
+
+@media screen and (max-width: 700px) {
+  .container-box {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
+  }
+}
+
+.info-box {
+  max-width: 100%;
+  width: 250px;
+}
+
+.box-header {
+  border-bottom: 1px solid #a5a5a5;
+}
+
+.line-box {
+  display: block;
+}
+
+.warning-container {
+  display: block;
+  max-width: 40%;
+}
+
+@media screen and (max-width: 700px) {
+  .warning-container {
+    max-width: 100%;
+  }
+}
+
+.graph-container {
+  display: block;
+  max-width: 60%;
+}
+/*# sourceMappingURL=table.css.map */

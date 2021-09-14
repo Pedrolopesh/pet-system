@@ -1,0 +1,355 @@
+.video {
+  display: block;
+  position: relative;
+}
+
+.video .container_video {
+  overflow: hidden;
+}
+
+@media screen and (max-width: 500px) {
+  .video .container_video {
+    overflow: hidden;
+  }
+}
+
+.video .container_video .size_video {
+  max-width: 100%;
+  width: 100%;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  display: block;
+  background-color: white;
+  background-size: cover;
+  overflow: hidden;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+@media screen and (max-width: 500px) {
+  .video .container_video .size_video {
+    min-height: 0vh;
+  }
+}
+
+.video .content_text {
+  position: absolute;
+  left: 0;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  color: #f1f1f1;
+  max-width: 100%;
+  width: 100%;
+  min-height: 100%;
+  padding: 60px;
+}
+
+@media screen and (max-width: 500px) {
+  .video .content_text {
+    min-height: 100%;
+    padding: 5px;
+  }
+}
+
+.video .content_text .title_video {
+  font-size: 60px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+@media screen and (max-width: 700px) {
+  .video .content_text .title_video {
+    font-size: 25px;
+  }
+}
+
+.video .content_text .content_video {
+  font-size: 40px;
+}
+
+@media screen and (max-width: 700px) {
+  .video .content_text .content_video {
+    font-size: 15px;
+  }
+}
+
+.left-image {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 400px;
+  width: 100%;
+}
+
+@media screen and (max-width: 700px) {
+  .left-image {
+    max-width: 400px;
+  }
+}
+
+.warning-header {
+  display: block;
+  max-width: 100%;
+  width: 50%;
+}
+
+@media screen and (max-width: 700px) {
+  .warning-header {
+    width: 100%;
+  }
+}
+
+.separete-class {
+  line-height: 60px;
+  padding: 10px;
+  max-width: 50%;
+  border-bottom: 1px solid black;
+}
+
+.flex-multiline {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+}
+
+.flex-multiline div {
+  -webkit-box-flex: 0;
+      -ms-flex-positive: 0;
+          flex-grow: 0;
+}
+
+.container_big {
+  max-width: 100%;
+  width: 2000px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.size_image_work {
+  margin-top: 60px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  position: relative;
+}
+
+.size_image_work p {
+  display: none;
+}
+
+.size_image_work p, .size_image_work img {
+  max-width: 90%;
+  width: 580px;
+}
+
+.size_image_work:hover > p {
+  line-height: 36px;
+  display: block;
+  position: absolute;
+  left: 5%;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+  bottom: 0px;
+  color: white;
+  margin-bottom: 0;
+  -webkit-animation-name: hover-image;
+          animation-name: hover-image;
+  -webkit-animation-iteration-count: 1;
+          animation-iteration-count: 1;
+  -webkit-animation-delay: 0;
+          animation-delay: 0;
+  -webkit-animation-duration: 0.9s;
+          animation-duration: 0.9s;
+  /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#ffffff+0,000000+100 */
+  background: #ffffff;
+  /* Old browsers */
+  /* FF3.6-15 */
+  /* Chrome10-25,Safari5.1-6 */
+  background: -webkit-gradient(linear, left top, left bottom, from(rgba(228, 228, 228, 0)), color-stop(80%, #000000a2));
+  background: linear-gradient(to bottom, rgba(228, 228, 228, 0) 0%, #000000a2 80%);
+  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#000000',GradientType=0 );
+  /* IE6-9 */
+}
+
+@-webkit-keyframes hover-image {
+  0% {
+    opacity: 0;
+    height: 0px;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+    height: 33px;
+  }
+}
+
+@keyframes hover-image {
+  0% {
+    opacity: 0;
+    height: 0px;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+    height: 33px;
+  }
+}
+
+.size_image_work .conten_image {
+  text-align: left;
+  padding: 0px 10px;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+}
+
+.bg-full-screen-contact {
+  background-image: url("../Resources/sizes/08.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  min-height: 500px;
+}
+
+.box-1 {
+  width: 100%;
+  padding: 20px;
+  border-radius: 10px;
+  -webkit-box-shadow: 3px 3px 10px rgba(53, 53, 53, 0.411);
+          box-shadow: 3px 3px 10px rgba(53, 53, 53, 0.411);
+  background-color: #f7f7f7;
+  max-width: 100%;
+}
+
+@media screen and (max-width: 700px) {
+  .box-1 {
+    margin-top: 30px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+}
+
+.container-image-contact {
+  max-width: 100%;
+}
+
+.bg-mask {
+  min-height: 500px;
+  max-width: 100%;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.4) !important;
+}
+
+.bg-mask-1 {
+  min-height: 500px;
+  max-width: 100%;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.4) !important;
+}
+
+.container-form {
+  padding: 25px;
+}
+
+.input-form {
+  max-width: 100%;
+  width: 330px;
+}
+
+.input-form-text {
+  min-height: 100px;
+}
+
+.all-iframe {
+  max-width: 100%;
+  width: 100%;
+  min-height: 400px;
+}
+
+.iframe {
+  max-width: 80%;
+}
+
+.iframe iframe {
+  max-width: 80%;
+}
+
+@media screen and (max-width: 700px) {
+  .iframe iframe {
+    max-width: 100%;
+  }
+}
+
+@media screen and (max-width: 700px) {
+  .iframe {
+    max-width: 100%;
+  }
+}
+
+.container-foot {
+  display: block;
+  max-width: 100%;
+  width: 100%;
+}
+
+.container-foot-1 {
+  display: block;
+  min-height: 300px;
+}
+
+.link-2 {
+  padding: 10px;
+  line-height: 70px;
+  color: white;
+  text-decoration: none;
+}
+
+.link-2:hover {
+  color: white;
+}
+
+.icon-footer {
+  color: white;
+  width: 40px;
+}
+
+@media screen and (max-width: 700px) {
+  .icon-footer {
+    width: 30px;
+  }
+}
+
+.subtitle-picture {
+  line-height: 26px;
+}
+
+.margin-b-0 {
+  margin-bottom: 0px !important;
+}
+
+.container-subtitle {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  max-width: 100%;
+}
+
+@media screen and (max-width: 700px) {
+  .container-subtitle {
+    display: block;
+  }
+}
+
+.icon-header {
+  width: 160px;
+}
+/*# sourceMappingURL=style-home.css.map */

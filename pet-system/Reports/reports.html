@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="../Resources/frameworks/Bootstrap/css/bootstrap-grid.min.css">
+    <link rel="stylesheet" href="../Resources/frameworks/Bootstrap/css/bootstrap-reboot.min.css">
+    <link rel="stylesheet" href="../Resources/frameworks/Bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../Resources/index.css">
+    <link rel="stylesheet" href="../Resources/side-bar.css">
+    <link rel="stylesheet" href="../Resources/table.css">
+    <link rel="stylesheet" href="./reports-style.css">
+
+    <link rel="stylesheet" href="../Resources/index.scss">
+
+    <link rel="shortcut icon" href="../Resources/favicon.svg" type="image/x-icon">
+
+
+    <title>Pet System</title>
+</head>
+<body>
+
+<!-- ================================================== sidebar menu ======================================== -->
+<div id="side_menu" class="container_side_menu">
+    <a href="#" class="buttons_side_menu" onclick="closeSideMenu()">&times;</a>
+    <a class="links_left_menu" href="../Home/dasboard.html">
+            <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="home" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" class="size_icon_menu"><path fill="currentColor" d="M280.37 148.26L96 300.11V464a16 16 0 0 0 16 16l112.06-.29a16 16 0 0 0 15.92-16V368a16 16 0 0 1 16-16h64a16 16 0 0 1 16 16v95.64a16 16 0 0 0 16 16.05L464 480a16 16 0 0 0 16-16V300L295.67 148.26a12.19 12.19 0 0 0-15.3 0zM571.6 251.47L488 182.56V44.05a12 12 0 0 0-12-12h-56a12 12 0 0 0-12 12v72.61L318.47 43a48 48 0 0 0-61 0L4.34 251.47a12 12 0 0 0-1.6 16.9l25.5 31A12 12 0 0 0 45.15 301l235.22-193.74a12.19 12.19 0 0 1 15.3 0L530.9 301a12 12 0 0 0 16.9-1.6l25.5-31a12 12 0 0 0-1.7-16.93z" class=""></path></svg>
+        Home</a>
+    <a class="links_left_menu" href="../Storage/storage-table/products-table.html">
+            <svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="box-open" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="size_icon_menu"><path fill="currentColor" d="M638.3 143.8L586.8 41c-4-8-12.1-9.5-16.7-8.9L320 64 69.8 32.1c-4.6-.6-12.6.9-16.6 8.9L1.7 143.8c-4.6 9.2.3 20.2 10.1 23L64 181.7V393c0 14.7 10 27.5 24.2 31l216.2 54.1c6 1.5 17.4 3.4 31 0L551.8 424c14.2-3.6 24.2-16.4 24.2-31V181.7l52.1-14.9c9.9-2.8 14.7-13.8 10.2-23zM86 82.6l154.8 19.7-41.2 68.3-138-39.4L86 82.6zm26 112.8l97.8 27.9c8 2.3 15.2-1.8 18.5-7.3L296 103.8v322.7l-184-46V195.4zm416 185.1l-184 46V103.8l67.7 112.3c3.3 5.5 10.6 9.6 18.5 7.3l97.8-27.9v185zm-87.7-209.9l-41.2-68.3L554 82.6l24.3 48.6-138 39.4z" class=""></path></svg>
+        Estoque</a>
+    <a class="links_left_menu" href="../Employes/Employes-table/employes-tables.html">
+            <svg aria-hidden="true" focusable="false" data-prefix="fal" data-icon="users" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="size_icon_menu"><path fill="currentColor" d="M544 224c44.2 0 80-35.8 80-80s-35.8-80-80-80-80 35.8-80 80 35.8 80 80 80zm0-128c26.5 0 48 21.5 48 48s-21.5 48-48 48-48-21.5-48-48 21.5-48 48-48zM320 256c61.9 0 112-50.1 112-112S381.9 32 320 32 208 82.1 208 144s50.1 112 112 112zm0-192c44.1 0 80 35.9 80 80s-35.9 80-80 80-80-35.9-80-80 35.9-80 80-80zm244 192h-40c-15.2 0-29.3 4.8-41.1 12.9 9.4 6.4 17.9 13.9 25.4 22.4 4.9-2.1 10.2-3.3 15.7-3.3h40c24.2 0 44 21.5 44 48 0 8.8 7.2 16 16 16s16-7.2 16-16c0-44.1-34.1-80-76-80zM96 224c44.2 0 80-35.8 80-80s-35.8-80-80-80-80 35.8-80 80 35.8 80 80 80zm0-128c26.5 0 48 21.5 48 48s-21.5 48-48 48-48-21.5-48-48 21.5-48 48-48zm304.1 180c-33.4 0-41.7 12-80.1 12-38.4 0-46.7-12-80.1-12-36.3 0-71.6 16.2-92.3 46.9-12.4 18.4-19.6 40.5-19.6 64.3V432c0 26.5 21.5 48 48 48h288c26.5 0 48-21.5 48-48v-44.8c0-23.8-7.2-45.9-19.6-64.3-20.7-30.7-56-46.9-92.3-46.9zM480 432c0 8.8-7.2 16-16 16H176c-8.8 0-16-7.2-16-16v-44.8c0-16.6 4.9-32.7 14.1-46.4 13.8-20.5 38.4-32.8 65.7-32.8 27.4 0 37.2 12 80.2 12s52.8-12 80.1-12c27.3 0 51.9 12.3 65.7 32.8 9.2 13.7 14.1 29.8 14.1 46.4V432zM157.1 268.9c-11.9-8.1-26-12.9-41.1-12.9H76c-41.9 0-76 35.9-76 80 0 8.8 7.2 16 16 16s16-7.2 16-16c0-26.5 19.8-48 44-48h40c5.5 0 10.8 1.2 15.7 3.3 7.5-8.5 16.1-16 25.4-22.4z" class=""></path></svg>
+        Funcionários</a>
+    <a class="links_left_menu" href="../Clients/Clients-table/clients-table.html">
+            <svg aria-hidden="true" focusable="false" data-prefix="fal" data-icon="user-friends" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="size_icon_menu"><path fill="currentColor" d="M480 256c53 0 96-43 96-96s-43-96-96-96-96 43-96 96 43 96 96 96zm0-160c35.3 0 64 28.7 64 64s-28.7 64-64 64-64-28.7-64-64 28.7-64 64-64zM192 256c61.9 0 112-50.1 112-112S253.9 32 192 32 80 82.1 80 144s50.1 112 112 112zm0-192c44.1 0 80 35.9 80 80s-35.9 80-80 80-80-35.9-80-80 35.9-80 80-80zm80.1 212c-33.4 0-41.7 12-80.1 12-38.4 0-46.7-12-80.1-12-36.3 0-71.6 16.2-92.3 46.9C7.2 341.3 0 363.4 0 387.2V432c0 26.5 21.5 48 48 48h288c26.5 0 48-21.5 48-48v-44.8c0-23.8-7.2-45.9-19.6-64.3-20.7-30.7-56-46.9-92.3-46.9zM352 432c0 8.8-7.2 16-16 16H48c-8.8 0-16-7.2-16-16v-44.8c0-16.6 4.9-32.7 14.1-46.4 13.8-20.5 38.4-32.8 65.7-32.8 27.4 0 37.2 12 80.2 12s52.8-12 80.1-12c27.3 0 51.9 12.3 65.7 32.8 9.2 13.7 14.1 29.8 14.1 46.4V432zm271.7-114.9C606.4 291.5 577 278 546.8 278c-27.8 0-34.8 10-66.8 10s-39-10-66.8-10c-13.2 0-26.1 3-38.1 8.1 15.2 15.4 18.5 23.6 20.2 26.6 5.7-1.6 11.6-2.6 17.9-2.6 21.8 0 30 10 66.8 10s45-10 66.8-10c21 0 39.8 9.3 50.4 25 7.1 10.5 10.9 22.9 10.9 35.7V408c0 4.4-3.6 8-8 8H416c0 17.7.3 22.5-1.6 32H600c22.1 0 40-17.9 40-40v-37.3c0-19.9-6-38.3-16.3-53.6z" class=""></path></svg>
+        Clientes</a>
+    <a class="links_left_menu" href="../sells/sells-table.html">
+            <svg aria-hidden="true" focusable="false" data-prefix="fal" data-icon="ballot-check" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="size_icon_menu"><path fill="currentColor" d="M112 432h32c17.7 0 32-14.4 32-32v-32c0-17.6-14.3-32-32-32h-32c-17.7 0-32 14.4-32 32v32c0 17.6 14.3 32 32 32zm0-64h32v32h-32v-32zm0-192h32c17.7 0 32-14.4 32-32v-32c0-17.6-14.3-32-32-32h-32c-17.7 0-32 14.4-32 32v32c0 17.6 14.3 32 32 32zm0-64h32v32h-32v-32zM416 0H32C14.3 0 0 14.4 0 32v448c0 17.6 14.3 32 32 32h384c17.7 0 32-14.4 32-32V32c0-17.6-14.3-32-32-32zm0 480H32V32h384v448zM216 144h128c4.4 0 8-3.6 8-8v-16c0-4.4-3.6-8-8-8H216c-4.4 0-8 3.6-8 8v16c0 4.4 3.6 8 8 8zm0 128h128c4.4 0 8-3.6 8-8v-16c0-4.4-3.6-8-8-8H216c-4.4 0-8 3.6-8 8v16c0 4.4 3.6 8 8 8zm0 128h128c4.4 0 8-3.6 8-8v-16c0-4.4-3.6-8-8-8H216c-4.4 0-8 3.6-8 8v16c0 4.4 3.6 8 8 8zm-97.4-113.6c2.1 2.1 5.5 2.1 7.6 0l64.2-63.6c2.1-2.1 2.1-5.5 0-7.6l-12.6-12.7c-2.1-2.1-5.5-2.1-7.6 0l-47.6 47.2-20.6-20.9c-2.1-2.1-5.5-2.1-7.6 0l-12.7 12.6c-2.1 2.1-2.1 5.5 0 7.6l36.9 37.4z" class=""></path></svg>
+        Vendas</a>
+    <a class="links_left_menu" href="./reports.html">
+            <svg aria-hidden="true" focusable="false" data-prefix="fal" data-icon="file-chart-line" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="size_icon_menu"><path fill="currentColor" d="M136 320h-16c-4.4 0-8 3.6-8 8v96c0 4.4 3.6 8 8 8h16c4.4 0 8-3.6 8-8v-96c0-4.4-3.6-8-8-8zm64-96h-16c-4.4 0-8 3.6-8 8v192c0 4.4 3.6 8 8 8h16c4.4 0 8-3.6 8-8V232c0-4.4-3.6-8-8-8zm40 72v128c0 4.4 3.6 8 8 8h16c4.4 0 8-3.6 8-8V296c0-4.4-3.6-8-8-8h-16c-4.4 0-8 3.6-8 8zM369.9 97.98L286.02 14.1c-9-9-21.2-14.1-33.89-14.1H47.99C21.5.1 0 21.6 0 48.09v415.92C0 490.5 21.5 512 47.99 512h288.02c26.49 0 47.99-21.5 47.99-47.99V131.97c0-12.69-5.1-24.99-14.1-33.99zM256.03 32.59c2.8.7 5.3 2.1 7.4 4.2l83.88 83.88c2.1 2.1 3.5 4.6 4.2 7.4h-95.48V32.59zm95.98 431.42c0 8.8-7.2 16-16 16H47.99c-8.8 0-16-7.2-16-16V48.09c0-8.8 7.2-16.09 16-16.09h176.04v104.07c0 13.3 10.7 23.93 24 23.93h103.98v304.01z" class=""></path></svg>
+        Relárotios</a>
+</div>
+<!-- ================================================== sidebar menu ======================================== -->
+
+ <!-- ================================================== header menu bar ======================================== -->
+ <div class="header container-sides">
+
+    <div class="container-left" onclick="openSideMenu()">
+        <a onclick="openSideMenu()">
+            <svg class="icon-size-2 cw cp" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="bars" role="img" viewBox="0 0 448 512"> <path fill="currentColor" d="M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z" class=""></path></svg>
+        </a>
+    </div>
+    
+    <div class="container-rigth text-a-e">
+        <h4 class="cw buttons-header mr-5 ml-a"><a class="header-link" href="../Home/dasboard.html">Home</a></h4>
+        <h4 class="cw buttons-header"><a class="header-link" href="../Login/login.html">Sair</a></h4>
+    </div>
+    
+</div>
+ <!-- ================================================== header menu bar ======================================== -->
+ <div class="container-header box-style-2 p2">
+    <div class="box-style-3 ml-13 p2">
+        <svg class="icon-size-2 icon-c-1" aria-hidden="true" focusable="false" data-prefix="fal" data-icon="file-chart-line" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path fill="currentColor" d="M136 320h-16c-4.4 0-8 3.6-8 8v96c0 4.4 3.6 8 8 8h16c4.4 0 8-3.6 8-8v-96c0-4.4-3.6-8-8-8zm64-96h-16c-4.4 0-8 3.6-8 8v192c0 4.4 3.6 8 8 8h16c4.4 0 8-3.6 8-8V232c0-4.4-3.6-8-8-8zm40 72v128c0 4.4 3.6 8 8 8h16c4.4 0 8-3.6 8-8V296c0-4.4-3.6-8-8-8h-16c-4.4 0-8 3.6-8 8zM369.9 97.98L286.02 14.1c-9-9-21.2-14.1-33.89-14.1H47.99C21.5.1 0 21.6 0 48.09v415.92C0 490.5 21.5 512 47.99 512h288.02c26.49 0 47.99-21.5 47.99-47.99V131.97c0-12.69-5.1-24.99-14.1-33.99zM256.03 32.59c2.8.7 5.3 2.1 7.4 4.2l83.88 83.88c2.1 2.1 3.5 4.6 4.2 7.4h-95.48V32.59zm95.98 431.42c0 8.8-7.2 16-16 16H47.99c-8.8 0-16-7.2-16-16V48.09c0-8.8 7.2-16.09 16-16.09h176.04v104.07c0 13.3 10.7 23.93 24 23.93h103.98v304.01z" class=""></path></svg>
+    </div>
+    <h2 class="ml-4 cbt-1">Relátorios</h2>
+</div>
+
+<div class="container-box mt-6 ac display-b">
+
+    <div class="box-style-1 info-box mr-a ml-5 p2">
+        <svg class="icon-size-3 clo ac display-b" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="product-hunt" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M326.3 218.8c0 20.5-16.7 37.2-37.2 37.2h-70.3v-74.4h70.3c20.5 0 37.2 16.7 37.2 37.2zM504 256c0 137-111 248-248 248S8 393 8 256 119 8 256 8s248 111 248 248zm-128.1-37.2c0-47.9-38.9-86.8-86.8-86.8H169.2v248h49.6v-74.4h70.3c47.9 0 86.8-38.9 86.8-86.8z" class=""></path></svg>
+         
+         <h1 class="ta-c display-b mt-3" id="total_products">0</h1>
+         
+         <div class="subtitle">
+             <p class="clo ta-c">Produtos no estoque</p>
+        </div>
+    </div>
+
+
+
+    <div class="box-style-1 ml-5 info-box mr-a p2">
+        <svg class="icon-size-3 clo ac display-b" aria-hidden="true" focusable="false" data-prefix="fad" data-icon="users" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><g class="fa-group"><path fill="currentColor" d="M96 224a64 64 0 1 0-64-64 64.06 64.06 0 0 0 64 64zm480 32h-64a63.81 63.81 0 0 0-45.1 18.6A146.27 146.27 0 0 1 542 384h66a32 32 0 0 0 32-32v-32a64.06 64.06 0 0 0-64-64zm-512 0a64.06 64.06 0 0 0-64 64v32a32 32 0 0 0 32 32h65.9a146.64 146.64 0 0 1 75.2-109.4A63.81 63.81 0 0 0 128 256zm480-32a64 64 0 1 0-64-64 64.06 64.06 0 0 0 64 64z" class="cblt"></path><path fill="currentColor" d="M396.8 288h-8.3a157.53 157.53 0 0 1-68.5 16c-24.6 0-47.6-6-68.5-16h-8.3A115.23 115.23 0 0 0 128 403.2V432a48 48 0 0 0 48 48h288a48 48 0 0 0 48-48v-28.8A115.23 115.23 0 0 0 396.8 288zM320 256a112 112 0 1 0-112-112 111.94 111.94 0 0 0 112 112z" class="cbl"></path></g></svg> 
+
+         <h1 class="ta-c display-b mt-3" id="total_clients">0</h1>
+         
+         <div class="subtitle">
+             <p class="cbl ta-c">Clientes Registrados</p>
+        </div>
+    </div>
+
+
+
+    <div class="box-style-1 ml-5 info-box mr-a p2">
+        <svg class="icon-size-3 clo ac display-b" aria-hidden="true" focusable="false" data-prefix="fad" data-icon="user-tie" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><g class="fa-group"><path fill="currentColor" d="M191.35 414.77L208 344l-32-56h96l-32 56 16.65 70.77L224 480zM224 256A128 128 0 1 0 96 128a128 128 0 0 0 128 128z" class="clr-w-1"></path><path fill="currentColor" d="M319.8 288.6L224 480l-95.8-191.4C56.9 292 0 350.3 0 422.4V464a48 48 0 0 0 48 48h352a48 48 0 0 0 48-48v-41.6c0-72.1-56.9-130.4-128.2-133.8z" class="clr-g"></path></g></svg>
+
+        <h1 class="ta-c display-b mt-3" id="tatal_employee">0</h1>
+        
+        <div class="subtitle">
+            <p class="clr-g ta-c">Funcionários Registrados</p>
+       </div>
+    </div>
+
+    <div class="box-style-1 ml-5 info-box mr-a p2">
+        <svg class="icon-size-3 cg ac display-b" aria-hidden="true" focusable="false" data-prefix="fad" data-icon="money-bill-wave" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><g class=""><path fill="currentColor" d="M545.58 371.77a112.42 112.42 0 0 1 46.43-41V133.21a112.4 112.4 0 0 1-52.16-51.09 283.47 283.47 0 0 0-35.1-2.12c-55.6 0-112.61 14.43-173 29.7-63.39 16-128.95 32.64-196.51 32.64a385.14 385.14 0 0 1-40.83-2.12 112.42 112.42 0 0 1-46.42 41v197.57a112.42 112.42 0 0 1 52.15 51.09 283.47 283.47 0 0 0 35.1 2.12c55.6 0 112.62-14.43 173-29.71 63.4-16.05 129-32.64 196.53-32.64a385 385 0 0 1 40.81 2.12zM320 352c-44.19 0-80-43-80-96s35.82-96 80-96 80 43 80 96-35.83 96-80 96z" class="cgt"></path><path fill="currentColor" d="M621.16 54.46C582.37 38.19 543.55 32 504.75 32c-123.19 0-246.34 62.34-369.5 62.34-30.89 0-61.76-3.92-92.65-13.72A34.19 34.19 0 0 0 32.25 79C15 79 0 92.32 0 110.81v317.26c0 12.63 7.23 24.6 18.84 29.46C57.63 473.81 96.45 480 135.25 480c123.17 0 246.34-62.35 369.51-62.35 30.89 0 61.76 3.92 92.65 13.72a34.19 34.19 0 0 0 10.35 1.63C625 433 640 419.67 640 401.18V83.93c0-12.64-7.23-24.6-18.84-29.47zM308.23 402.29C247.87 417.57 190.85 432 135.25 432a283.47 283.47 0 0 1-35.1-2.12A112.42 112.42 0 0 0 48 378.79V181.21a112.42 112.42 0 0 0 46.42-41 385.14 385.14 0 0 0 40.83 2.12c67.56 0 133.12-16.59 196.51-32.64C392.11 94.43 449.12 80 504.72 80a283.47 283.47 0 0 1 35.1 2.12A112.4 112.4 0 0 0 592 133.21v197.58a112.42 112.42 0 0 0-46.43 41 385 385 0 0 0-40.82-2.12c-67.56-.02-133.12 16.57-196.52 32.62z" class="fa-primary"></path></g></svg>
+
+        <h1 class="ta-c display-b mt-3">R$<span id="tatal_return">0</span></h1>
+        
+        <div class="subtitle">
+            <p class="cgt ta-c">Total em Vendas</p>
+       </div>
+    </div>
+
+</div>
+
+
+
+
+
+<div class="container-box ac mt-5 mb-5">
+    <div class="warning-container w-300 box-style-1 ml-5">
+        
+
+        <div class="box-header">
+
+            <h1 class="p2">
+                Avisos
+            </h1>
+        </div>
+            
+
+
+        <div class="container-b-1 warning-tasks-1" id="newWarning">
+
+            <div class="p2 line-box">
+                <svg class="circle-primary" aria-hidden="true" focusable="false" data-prefix="far" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200z" class=""></path></svg>
+                <span class="ml-3 mr-3">Reunião as 20:00</span>
+                <span class="badge badge-danger">NEW</span>
+            </div>
+
+        </div>
+
+
+
+            <div class="pagination-table">
+                <button type="button" class="btn btn-info ac display-b mt-3" onclick="warningShow()">Criar nova</button>
+            </div>
+    </div>
+
+    <div class="graph-container ml-9 w-100">
+
+        <div class="box-style-1 box-style-1 w-500">
+           
+            <div class="box-header">
+                <h1 class="p2">
+                    Rendimento Diário
+                </h1>
+            </div>
+
+            <div class="p2">
+                <div id="chartContainer" style="height: 300px; width: 100%;"></div>
+                <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+            </div>
+        
+        </div>
+
+
+    </div>
+</div>
+
+<div class="modal_hiding" id="modal">
+    <div class="modal_block">
+        <div class="header-modal">
+            <span onclick="hideModal()" class="cp"><svg class="close-icon ml-a mr-3 mt-2 display-b" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="times" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512"><path fill="currentColor" d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z" class=""></path></svg></span>
+        </div>
+    
+
+
+    <div class="ac mw-70 container-flex mt-5 mb-6">
+
+        <!-- <div class="display-b mw-50 icon-header-modal mt-3">
+            <svg class="icon-size-3 icon-c-1 mt-5" aria-hidden="true" focusable="false" data-prefix="far" data-icon="box-open" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><path fill="currentColor" d="M638.3 143.8L586.8 41c-4-8-12.1-9.5-16.7-8.9L320 64 69.8 32.1c-4.6-.6-12.6.9-16.6 8.9L1.7 143.8c-4.6 9.2.3 20.2 10.1 23L64 181.7V393c0 14.7 10 27.5 24.2 31l216.2 54.1c6 1.5 17.4 3.4 31 0L551.8 424c14.2-3.6 24.2-16.4 24.2-31V181.7l52.1-14.9c9.9-2.8 14.7-13.8 10.2-23zM86 82.6l154.8 19.7-41.2 68.3-138-39.4L86 82.6zm26 112.8l97.8 27.9c8 2.3 15.2-1.8 18.5-7.3L296 103.8v322.7l-184-46V195.4zm416 185.1l-184 46V103.8l67.7 112.3c3.3 5.5 10.6 9.6 18.5 7.3l97.8-27.9v185zm-87.7-209.9l-41.2-68.3L554 82.6l24.3 48.6-138 39.4z" class=""></path></svg>
+        </div> -->
+            
+        <div class="display-b mw-50 ac">
+
+            <div class="display-f">
+                <strong class="subtitle-modal mt-2">Prioridade da tarefa:</strong>
+                
+                <span class="content-info mt-2 ml-2" id="product_id"></span>    
+            </div>
+            
+            <div class="display-f mt-3">
+                <button type="button" class="btn btn-outline-danger ac" id="priority_danger" onclick="stateSelect('danger')">O</button>
+                <button type="button"class="btn btn-outline-primary ac" id="priority_primary" onclick="stateSelect('primary')">O</button>
+                <button type="button" class="btn btn-outline-warning ac" id="priority_warning" onclick="stateSelect('warning')">O</button>
+            </div>
+
+                <!-- <svg class="circle-danger ac cp" aria-hidden="true" focusable="false" data-prefix="far" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200z" class=""></path></svg> -->
+                <!-- <svg class="circle-primary ac cp" aria-hidden="true" focusable="false" data-prefix="far" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200z" class=""></path></svg> -->
+                <!-- <svg class="circle-warning ac cp" aria-hidden="true" focusable="false" data-prefix="far" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200z" class=""></path></svg> -->
+
+            <div class="mt-4">
+                <input type="text" placeholder="tarefa" id="text" class="issue-input">
+                <p class="small">*Escreva uma atividade de forma resumida (como um lembrente)</p>
+            </div>
+                
+
+            <div class="mt-4">
+                <a class="btn btn-primary ac display-b mw-30" href="#" role="button" onclick="printWarning()">Criar</a>
+            </div>
+ 
+        </div>
+    </div>
+
+</div>
+
+</div>
+        
+        
+    </body>
+
+<script src="./reports.js"></script>
+
+    <script>
+        window.addEventListener('load', function(){
+            getDataCharts()
+            // dataCharts()
+        });
+
+        var sales = JSON.parse(localStorage.getItem("TotalSells"));
+
+        function getDataCharts(){
+        let salesToChart = [];
+        for(let i=0;i < sales.length;i++){
+            let objToChart;
+            objToChart = {
+                x: new Date(sales[i].purchaseDay),
+                y: parseFloat(sales[i].purchaseTotal),
+            }
+            salesToChart.push(objToChart)
+            
+            // console.log("x:" +sales[i].purchaseDay)
+            // console.log("y:" +sales[i].purchaseTotal)
+        }
+        sales = salesToChart;
+        // console.log(sales)
+        let chartsData = sales;
+        // console.log(chartsData)
+        dataCharts()
+    }
+
+        function dataCharts(){
+            console.log(sales)
+            
+            var chart = new CanvasJS.Chart("chartContainer", {
+            animationEnabled: true,
+            title:{
+                text: "Rendimento Diário"
+            },
+            axisX:{
+                valueFormatString: "DD",
+                crosshair: {
+                    enabled: true,
+                    snapToDataPoint: true
+                }
+            },
+            axisY: {
+                title: "Vendas",
+                includeZero: false,
+                valueFormatString: "R$##0.00",
+                crosshair: {
+                    enabled: true,
+                    snapToDataPoint: true,
+                    labelFormatter: function(e) {
+                        return "R$" + CanvasJS.formatNumber(e.value, "##0.00");
+                    }
+                }
+            },
+            
+            // datacharts:[],
+            
+            data: [{
+                type: "area",
+                xValueFormatString: "DD MMM",
+                yValueFormatString: "R$##0.00",
+                // dataPoints: [
+                //     { x: new Date(2020, 07, 01), y: 76.727997 },
+                //     // { x: new Date(2020, 07, 02), y: 75.459999 },
+                //     // { x: new Date(2020, 07, 03), y: 76.011002 },
+                //     // { x: new Date(2020, 07, 04), y: 75.751999 },
+                //     // { x: new Date(2020, 07, 05), y: 77.500000 },
+                //     // { x: new Date(2020, 07, 08), y: 77.436996 },
+                //     // { x: new Date(2020, 07, 09), y: 79.650002 },
+                //     // { x: new Date(2020, 07, 10), y: 79.750999 },
+                //     // { x: new Date(2020, 07, 11), y: 80.169998 },
+                //     // { x: new Date(2020, 07, 12), y: 79.570000 },
+                //     // { x: new Date(2020, 07, 15), y: 80.699997 },
+                //     // { x: new Date(2020, 07, 16), y: 79.686996 },
+                //     // { x: new Date(2020, 07, 17), y: 78.996002 },
+                //     // { x: new Date(2020, 07, 18), y: 78.899002 },
+                //     // { x: new Date(2020, 07, 19), y: 77.127998 },
+                //     // { x: new Date(2020, 07, 22), y: 76.759003 },
+                //     // { x: new Date(2020, 07, 23), y: 77.480003 },
+                //     // { x: new Date(2020, 07, 24), y: 77.623001 },
+                //     // { x: new Date(2020, 07, 25), y: 76.408997 },
+                //     // { x: new Date(2020, 07, 26), y: 76.041000 },
+                //     // { x: new Date(2020, 07, 29), y: 76.778999 },
+                //     // { x: new Date(2020, 07, 30), y: 78.654999 },
+                //     // { x: new Date(2020, 07, 31), y: 77.667000 }
+                // ]
+                dataPoints: sales, 
+            }]
+        });
+        
+        chart.render();
+        }
+
+
+        // window.onload = function () {
+
+        // var chart = new CanvasJS.Chart("chartContainer", {
+        //     animationEnabled: true,
+        //     title:{
+        //         text: "Lucro do Dia"
+        //     },
+        //     axisX:{
+        //         valueFormatString: "DD MMM",
+        //         crosshair: {
+        //             enabled: true,
+        //             snapToDataPoint: true
+        //         }
+        //     },
+        //     axisY: {
+        //         title: "Vendas",
+        //         includeZero: false,
+        //         valueFormatString: "R$##0.00",
+        //         crosshair: {
+        //             enabled: true,
+        //             snapToDataPoint: true,
+        //             labelFormatter: function(e) {
+        //                 return "R$" + CanvasJS.formatNumber(e.value, "##0.00");
+        //             }
+        //         }
+        //     },
+        //     data: [{
+        //         type: "area",
+        //         xValueFormatString: "DD MMM",
+        //         yValueFormatString: "R$##0.00",
+        //         dataPoints: [
+        //             { x: new Date(2020, 07, 01), y: 76.727997 },
+        //             { x: new Date(2020, 07, 02), y: 75.459999 },
+        //             { x: new Date(2020, 07, 03), y: 76.011002 },
+        //             { x: new Date(2020, 07, 04), y: 75.751999 },
+        //             { x: new Date(2020, 07, 05), y: 77.500000 },
+        //             { x: new Date(2020, 07, 08), y: 77.436996 },
+        //             { x: new Date(2020, 07, 09), y: 79.650002 },
+        //             { x: new Date(2020, 07, 10), y: 79.750999 },
+        //             { x: new Date(2020, 07, 11), y: 80.169998 },
+        //             { x: new Date(2020, 07, 12), y: 79.570000 },
+        //             { x: new Date(2020, 07, 15), y: 80.699997 },
+        //             { x: new Date(2020, 07, 16), y: 79.686996 },
+        //             { x: new Date(2020, 07, 17), y: 78.996002 },
+        //             { x: new Date(2020, 07, 18), y: 78.899002 },
+        //             { x: new Date(2020, 07, 19), y: 77.127998 },
+        //             { x: new Date(2020, 07, 22), y: 76.759003 },
+        //             { x: new Date(2020, 07, 23), y: 77.480003 },
+        //             { x: new Date(2020, 07, 24), y: 77.623001 },
+        //             { x: new Date(2020, 07, 25), y: 76.408997 },
+        //             { x: new Date(2020, 07, 26), y: 76.041000 },
+        //             { x: new Date(2020, 07, 29), y: 76.778999 },
+        //             { x: new Date(2020, 07, 30), y: 78.654999 },
+        //             { x: new Date(2020, 07, 31), y: 77.667000 }
+        //         ]
+        //     }]
+        // });
+        // chart.render();
+        // }
+
+
+
+        </script>
+
+
+<script>
+    function openSideMenu() {
+        document.getElementById('side_menu').style.width = '250px'
+        // document.getElementById('main').style.marginLeft = '250px'
+    }
+    
+    
+    function closeSideMenu() {
+        document.getElementById('side_menu').style.width = '0px'
+        // document.getElementById('main').style.marginLeft = '0px'
+    }
+</script>
+</html>
+
