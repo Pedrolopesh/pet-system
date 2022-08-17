@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro</title>
+    <script>
+        function redirect() {
+            window.location.href = "./Pet-System-website/Home/home.html";
+        }
+
+        function createMockStorage() {
+            const Client = [{"name":"Cliente Test 1","adress":"R. Test 1","phone":"123123123","email":"cliente_test@test.com","id":1,"pass":"123123"}]
+            const TotalSells = [{"purchaseDay":"2022,8,16","purchaseTotal":"100.00"}]
+            const Purchases = [{"productId":1,"name":"Ração","price":"100","quant":1,"client":"Cliente Test 1","employee":"test"}]
+            const Employee = [{"name":"Usuário Teste","adress":"R. Endereço Teste","phone":"123123123123","email":"test@gmail.com","id":1,"pass":"123123","confirmPass":"123123"},{"name":"test","adress":"test","phone":"test","email":"test","id":"test","pass":"test","confirmPass":"test"}]
+            const player = [{"personName":"Pedro Lopes","personEmail":"pedrolopeshls99@gmail.com","personphone":"48999422614","personTime":11},{"personName":"teste 1","personEmail":"teste@test.com","personphone":"2312312312","personTime":9},{"personName":"teste 5","personEmail":"dsadasdas","personphone":"21312321"},{"personName":"teste 43234","personEmail":"email teste 1","personphone":"21312312312321","personTime":3}]
+            const Products = [{"id":1,"name":"Ração","price":"100","quant":"1"}]
+
+            localStorage.setItem("Client", JSON.stringify(Client));
+            localStorage.setItem("TotalSells", JSON.stringify(TotalSells));
+            localStorage.setItem("Purchases", JSON.stringify(Purchases));
+            localStorage.setItem("Employee", JSON.stringify(Employee));
+            localStorage.setItem("player", JSON.stringify(player));
+            localStorage.setItem("Products", JSON.stringify(Products));
+        }
+        createMockStorage();
+        redirect();
+    </script>
+</head>
+<body>
+
+</body>
+</html>
