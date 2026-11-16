@@ -26,6 +26,8 @@ export const ERROR_CODES = {
   PLAN_LIMIT: 'PLAN_LIMIT',
   /** Convite inválido, expirado ou já usado. */
   INVALID_INVITE: 'INVALID_INVITE',
+  /** Registro do prontuário fora da janela de correção. */
+  RECORD_LOCKED: 'RECORD_LOCKED',
   INTERNAL_ERROR: 'INTERNAL_ERROR',
 } as const;
 

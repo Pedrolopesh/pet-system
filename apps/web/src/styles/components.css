@@ -378,7 +378,8 @@
     background 0.2s,
     color 0.2s;
 }
-.segmented button[aria-pressed="true"] {
+.segmented button[aria-pressed="true"],
+.segmented button[aria-selected="true"] {
   background: #fff;
   color: var(--brand-deep);
   box-shadow: var(--shadow-sm);

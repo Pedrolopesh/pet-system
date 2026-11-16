@@ -63,6 +63,8 @@ export class DemoService {
     });
     if (!shop) return;
     await this.prisma.$transaction([
+      this.prisma.vaccination.deleteMany({ where: { shopId: shop.id } }),
+      this.prisma.medicalRecord.deleteMany({ where: { shopId: shop.id } }),
       this.prisma.appointment.deleteMany({ where: { shopId: shop.id } }),
       this.prisma.sale.deleteMany({ where: { shopId: shop.id } }),
       this.prisma.stockMovement.deleteMany({ where: { shopId: shop.id } }),

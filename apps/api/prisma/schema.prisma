@@ -68,6 +68,19 @@ enum AppointmentStatus {
   faltou
 }
 
+enum PetSex {
+  macho
+  femea
+}
+
+enum RecordKind {
+  consulta
+  retorno
+  vacinacao
+  emergencia
+  procedimento
+}
+
 enum NotePriority {
   urgente
   importante
@@ -107,6 +120,8 @@ model Shop {
   movements    StockMovement[]
   appointments Appointment[]
   invites      Invite[]
+  records      MedicalRecord[]
+  vaccinations Vaccination[]
 
   @@map("shops")
 }
@@ -122,8 +137,9 @@ model User {
   createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz
   lastLoginAt  DateTime? @map("last_login_at") @db.Timestamptz
 
-  shop          Shop           @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  shop          Shop            @relation(fields: [shopId], references: [id], onDelete: Cascade)
   refreshTokens RefreshToken[]
+  records       MedicalRecord[]
 
   @@map("users")
 }
@@ -205,14 +221,22 @@ model Client {
 }
 
 model Pet {
-  id       String  @id @default(uuid()) @db.Uuid
-  clientId String  @map("client_id") @db.Uuid
-  name     String  @db.VarChar(40)
-  species  Species
-  breed    String  @default("") @db.VarChar(40)
+  id        String    @id @default(uuid()) @db.Uuid
+  clientId  String    @map("client_id") @db.Uuid
+  name      String    @db.VarChar(40)
+  species   Species
+  breed     String    @default("") @db.VarChar(40)
+  /// Ficha de saúde (opcional, preenchida pela clínica)
+  birthDate DateTime? @map("birth_date") @db.Date
+  sex       PetSex?
+  neutered  Boolean?
+  /// Alergias e alertas clínicos, mostrados em destaque no prontuário
+  allergies String    @default("") @db.VarChar(300)
 
-  client       Client        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  client       Client          @relation(fields: [clientId], references: [id], onDelete: Cascade)
   appointments Appointment[]
+  records      MedicalRecord[]
+  vaccinations Vaccination[]
 
   @@map("pets")
 }
@@ -224,9 +248,11 @@ model Employee {
   role   Role
   active Boolean @default(true)
 
-  shop         Shop          @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  shop         Shop            @relation(fields: [shopId], references: [id], onDelete: Cascade)
   sales        Sale[]
   appointments Appointment[]
+  records      MedicalRecord[]
+  vaccinations Vaccination[]
 
   @@map("employees")
 }
@@ -308,6 +334,8 @@ model Appointment {
   createdAt  DateTime          @default(now()) @map("created_at") @db.Timestamptz
   updatedAt  DateTime          @updatedAt @map("updated_at") @db.Timestamptz
 
+  records MedicalRecord[]
+
   shop     Shop      @relation(fields: [shopId], references: [id], onDelete: Cascade)
   client   Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
   pet      Pet       @relation(fields: [petId], references: [id], onDelete: Cascade)
@@ -334,4 +362,77 @@ model Invite {
 
   @@index([shopId])
   @@map("invites")
+}
+
+/// Registro do prontuário. Não é apagado; pode ser editado só nas primeiras 24 horas.
+model MedicalRecord {
+  id              String     @id @default(uuid()) @db.Uuid
+  shopId          String     @map("shop_id") @db.Uuid
+  petId           String     @map("pet_id") @db.Uuid
+  /// Veterinário(a) responsável (profissional da equipe)
+  vetId           String?    @map("vet_id") @db.Uuid
+  /// Quem registrou no sistema
+  authorId        String?    @map("author_id") @db.Uuid
+  appointmentId   String?    @map("appointment_id") @db.Uuid
+  kind            RecordKind @default(consulta)
+  at              DateTime   @db.Timestamptz
+  /// Peso em gramas e temperatura em décimos de grau (inteiros, sem arredondamento de float)
+  weightGrams     Int?       @map("weight_grams")
+  temperatureDeci Int?       @map("temperature_deci")
+  complaint       String     @default("") @db.VarChar(2000)
+  exam            String     @default("") @db.VarChar(4000)
+  diagnosis       String     @default("") @db.VarChar(2000)
+  treatment       String     @default("") @db.VarChar(4000)
+  createdAt       DateTime   @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime   @updatedAt @map("updated_at") @db.Timestamptz
+
+  shop         Shop               @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  pet          Pet                @relation(fields: [petId], references: [id], onDelete: Cascade)
+  vet          Employee?          @relation(fields: [vetId], references: [id], onDelete: SetNull)
+  author       User?              @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  appointment  Appointment?       @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
+  prescription PrescriptionItem[]
+  vaccinations Vaccination[]
+
+  @@index([petId, at])
+  @@map("medical_records")
+}
+
+model PrescriptionItem {
+  id           String @id @default(uuid()) @db.Uuid
+  recordId     String @map("record_id") @db.Uuid
+  position     Int
+  medication   String @db.VarChar(120)
+  dosage       String @default("") @db.VarChar(120)
+  frequency    String @default("") @db.VarChar(120)
+  duration     String @default("") @db.VarChar(120)
+  instructions String @default("") @db.VarChar(500)
+
+  record MedicalRecord @relation(fields: [recordId], references: [id], onDelete: Cascade)
+
+  @@index([recordId])
+  @@map("prescription_items")
+}
+
+/// Vacina aplicada, com a data do próximo reforço para o lembrete.
+model Vaccination {
+  id         String    @id @default(uuid()) @db.Uuid
+  shopId     String    @map("shop_id") @db.Uuid
+  petId      String    @map("pet_id") @db.Uuid
+  recordId   String?   @map("record_id") @db.Uuid
+  vetId      String?   @map("vet_id") @db.Uuid
+  vaccine    String    @db.VarChar(80)
+  appliedAt  DateTime  @map("applied_at") @db.Date
+  nextDoseAt DateTime? @map("next_dose_at") @db.Date
+  batch      String    @default("") @db.VarChar(40)
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz
+
+  shop   Shop           @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  pet    Pet            @relation(fields: [petId], references: [id], onDelete: Cascade)
+  record MedicalRecord? @relation(fields: [recordId], references: [id], onDelete: SetNull)
+  vet    Employee?      @relation(fields: [vetId], references: [id], onDelete: SetNull)
+
+  @@index([shopId, nextDoseAt])
+  @@index([petId, appliedAt])
+  @@map("vaccinations")
 }

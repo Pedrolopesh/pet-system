@@ -16,7 +16,7 @@ const BY_CODE: Record<string, string> = {
 /** Mensagem para a pessoa a partir de qualquer erro (código da API primeiro, texto genérico por último). */
 export function friendly(error: unknown): string {
   if (error instanceof ApiError) {
-    if (["OUT_OF_STOCK", "SLOT_TAKEN", "INVALID_STATUS", "PLAN_LIMIT"].includes(error.code))
+    if (["OUT_OF_STOCK", "SLOT_TAKEN", "INVALID_STATUS", "PLAN_LIMIT", "RECORD_LOCKED"].includes(error.code))
       return error.message.endsWith(".") ? error.message : `${error.message}.`;
     if (error.code === "OUT_OF_STOCK") return error.message.endsWith(".") ? error.message : `${error.message}.`;
     if (error.code === "VALIDATION_ERROR") {

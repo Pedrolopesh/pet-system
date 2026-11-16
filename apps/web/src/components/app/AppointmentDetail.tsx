@@ -10,6 +10,7 @@ import { agendaApi } from "@/lib/api";
 import { hhmm, localIso, minuteOfDay, minutesOf, toDay } from "@/lib/dates";
 import { brl, phone } from "@/lib/format";
 import { friendly } from "@/lib/messages";
+import { useSession } from "@/lib/session";
 
 const STEP_ICON: Partial<Record<AppointmentStatus, IconName>> = {
   confirmado: "check",
@@ -31,6 +32,8 @@ export function AppointmentDetail({
   onClose: () => void;
   onChanged: (a: Appointment) => void;
 }) {
+  const { me } = useSession();
+  const clinic = me?.shop.businessTypes.includes("clinica") ?? false;
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [moving, setMoving] = useState(false);
@@ -123,6 +126,9 @@ export function AppointmentDetail({
           {error && <p className="error" role="alert">{error}</p>}
 
           <div className="detail-actions">
+            {clinic && a.employee && a.status !== "cancelado" && (
+              <Link className="btn ghost" href={`/app/clinica/pet/?id=${a.pet.id}&atendimento=${a.id}`}><Icon name="stethoscope" size={16} /> Prontuário</Link>
+            )}
             {!a.saleId && a.status !== "cancelado" && a.status !== "faltou" && (
               <Link className="btn ghost" href={`/app/vender/?atendimento=${a.id}`}><Icon name="cart" size={16} /> Cobrar no caixa</Link>
             )}

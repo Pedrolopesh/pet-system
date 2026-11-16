@@ -2,6 +2,7 @@
 
 import type { Client, ClientDetail, Pet, Sale } from "@petsystem/contracts";
 import { LABELS, SPECIES } from "@petsystem/contracts";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState, type CSSProperties, type FormEvent } from "react";
 import { Icon } from "@/components/Icon";
@@ -10,6 +11,7 @@ import { Avatar, EmptyState, Skeletons } from "@/components/ui";
 import { clientsApi, salesApi } from "@/lib/api";
 import { brl, phone, shortDate, when } from "@/lib/format";
 import { friendly } from "@/lib/messages";
+import { useSession } from "@/lib/session";
 import { useToast } from "@/lib/toast";
 
 const SPECIES_ICON: Record<Pet["species"], string> = { cao: "🐶", gato: "🐱", outro: "🐾" };
@@ -18,6 +20,8 @@ const newPet = (): PetForm => ({ key: Math.random().toString(36).slice(2), name:
 
 export function ClientsBoard() {
   const toast = useToast();
+  const { me } = useSession();
+  const clinic = me?.shop.businessTypes.includes("clinica") ?? false;
   const params = useSearchParams();
   const router = useRouter();
   const [list, setList] = useState<Client[] | null>(null);
@@ -178,6 +182,7 @@ export function ClientsBoard() {
                 <div key={p.id} className="pet-card">
                   <span className="emoji" aria-hidden="true">{SPECIES_ICON[p.species]}</span>
                   <div><strong>{p.name}</strong><small className="muted">{LABELS.species[p.species]}{p.breed ? ` · ${p.breed}` : ""}</small></div>
+                  {clinic && <Link className="btn sm ghost" href={`/app/clinica/pet/?id=${p.id}`}>Ficha clínica</Link>}
                 </div>
               ))}
               {!detail.pets.length && <p className="muted">Nenhum pet cadastrado.</p>}

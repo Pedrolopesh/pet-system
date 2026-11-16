@@ -1,5 +1,14 @@
 import type {
   Account,
+  ClinicalFile,
+  ClinicalPet,
+  DueVaccine,
+  MedicalRecord,
+  PetHealth,
+  PrescriptionDoc,
+  RecordInput,
+  Vaccination,
+  VaccinationInput,
   Appointment,
   AppointmentInput,
   AppointmentStatus,
@@ -108,4 +117,16 @@ export const notesApi = {
 export const reportsApi = {
   dashboard: () => request<Dashboard>("/dashboard"),
   report: (days: number) => request<Report>(`/reports?days=${days}`),
+};
+
+export const clinicApi = {
+  file: (petId: string) => request<ClinicalFile>(`/pets/${petId}/clinical`),
+  updateHealth: (petId: string, body: PetHealth) => request<ClinicalPet>(`/pets/${petId}/health`, json("PATCH", body)),
+  createRecord: (petId: string, body: RecordInput) => request<MedicalRecord>(`/pets/${petId}/records`, json("POST", body)),
+  updateRecord: (id: string, body: RecordInput) => request<MedicalRecord>(`/records/${id}`, json("PUT", body)),
+  prescription: (id: string) => request<PrescriptionDoc>(`/records/${id}/prescription`),
+  addVaccination: (petId: string, body: VaccinationInput) =>
+    request<Vaccination>(`/pets/${petId}/vaccinations`, json("POST", body)),
+  removeVaccination: (id: string) => request<void>(`/vaccinations/${id}`, json("DELETE")),
+  due: (days = 30) => request<DueVaccine[]>(`/vaccinations/due?days=${days}`),
 };

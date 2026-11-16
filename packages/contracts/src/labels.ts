@@ -1,10 +1,19 @@
 import type { AppointmentStatus } from './agenda.js';
 import type { Category } from './catalog.js';
+import type { PET_SEX, RecordKind } from './clinic.js';
 import type { ROLES, SPECIES } from './people.js';
 import type { BusinessType, UserRole } from './saas.js';
 import type { NOTE_PRIORITIES, Payment } from './sales.js';
 
 export const LABELS = {
+  recordKind: {
+    consulta: 'Consulta',
+    retorno: 'Retorno',
+    vacinacao: 'Vacinação',
+    emergencia: 'Emergência',
+    procedimento: 'Procedimento',
+  } satisfies Record<RecordKind, string>,
+  sex: { macho: 'Macho', femea: 'Fêmea' } satisfies Record<(typeof PET_SEX)[number], string>,
   business: {
     petshop: 'Pet shop',
     creche: 'Creche e hotel',

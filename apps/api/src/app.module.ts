@@ -14,6 +14,7 @@ import { AgendaModule } from './modules/agenda/agenda.controller.js';
 import { AuthController } from './modules/auth/auth.controller.js';
 import { AuthModule } from './modules/auth/auth.module.js';
 import { CatalogModule } from './modules/catalog/catalog.module.js';
+import { ClinicModule } from './modules/clinic/clinic.controller.js';
 import { HealthModule } from './modules/health/health.controller.js';
 import { MaintenanceModule } from './modules/maintenance.module.js';
 import { NotesModule } from './modules/notes/notes.controller.js';
@@ -86,6 +87,7 @@ const REQUEST_ID = /^[A-Za-z0-9_-]{8,64}$/;
     AuthModule,
     AgendaModule,
     CatalogModule,
+    ClinicModule,
     PeopleModule,
     SalesModule,
     NotesModule,

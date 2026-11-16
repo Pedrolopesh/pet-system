@@ -9,10 +9,12 @@ import type { Prisma } from '../../generated/prisma/client.js';
 import { PrismaService } from '../../prisma/prisma.service.js';
 import {
   PAYMENT_WEIGHTS,
+  SAMPLE_CASES,
   SAMPLE_CLIENTS,
   SAMPLE_EMPLOYEES,
   SAMPLE_NOTES,
   SAMPLE_PRODUCTS,
+  SAMPLE_VACCINES,
 } from './catalog-data.js';
 import { int, pickWeighted, seeded } from './rng.js';
 
@@ -157,6 +159,7 @@ export class SampleDataService {
           if (rand() < 0.8) {
             const { client, petId } = pick();
             appointments.push({
+              id: randomUUID(),
               shopId,
               clientId: client.id,
               petId,
@@ -189,6 +192,115 @@ export class SampleDataService {
             endsAt: end,
             status: statusFor(start, end),
             price: service.price,
+          });
+        }
+      }
+    }
+
+    // ---------- clínica: ficha de saúde, prontuários e vacinas ----------
+    const records: Prisma.MedicalRecordCreateManyInput[] = [];
+    const prescriptions: Prisma.PrescriptionItemCreateManyInput[] = [];
+    const vaccinations: Prisma.VaccinationCreateManyInput[] = [];
+    const petHealth = new Map<
+      string,
+      { birthDate: Date; sex: 'macho' | 'femea'; neutered: boolean; allergies: string }
+    >();
+    const vet = employees.find((e) => e.role === 'veterinario');
+    const dayOnly = (d: Date) => new Date(`${localDay(d, tz)}T00:00:00Z`);
+    if (types.includes('clinica') && vet) {
+      const allPets = clients.flatMap((c) =>
+        c.pets.map(([, species], i) => ({ id: c.petIds[i]!, species })),
+      );
+      // Peso base de cada pet (gramas): as consultas variam pouco em volta dele.
+      const baseWeight = new Map<string, number>(
+        allPets.map((p) => [
+          p.id,
+          (p.species === 'gato'
+            ? int(rand, 30, 60)
+            : p.species === 'cao'
+              ? int(rand, 50, 350)
+              : int(rand, 15, 30)) * 100,
+        ]),
+      );
+      for (const [i, pet] of allPets.entries()) {
+        petHealth.set(pet.id, {
+          birthDate: dayOnly(
+            new Date(
+              now.getTime() - int(rand, 1, 12) * 365 * 86_400_000 - int(rand, 0, 300) * 86_400_000,
+            ),
+          ),
+          sex: rand() < 0.5 ? 'macho' : 'femea',
+          neutered: rand() < 0.6,
+          allergies:
+            i === 0
+              ? 'Alergia a frango (dermatite).'
+              : i === 5
+                ? 'Reação à vacina em 2024: observar 30 min após aplicar.'
+                : '',
+        });
+        if (pet.species === 'outro') continue;
+        // Histórico: última dose há 10 a 14 meses, então alguns reforços já venceram e outros vencem logo.
+        for (const vaccine of SAMPLE_VACCINES[pet.species]) {
+          const applied = dayOnly(new Date(now.getTime() - int(rand, 300, 420) * 86_400_000));
+          vaccinations.push({
+            shopId,
+            petId: pet.id,
+            vetId: vet.id,
+            vaccine,
+            appliedAt: applied,
+            nextDoseAt: new Date(applied.getTime() + 365 * 86_400_000),
+            batch: `L${int(rand, 1000, 9999)}`,
+            createdAt: applied,
+          });
+        }
+      }
+      // Consultas e vacinas concluídas da agenda viram registros no prontuário.
+      const vaccineByService: Record<string, string> = {
+        'Vacina V10': 'V10 (polivalente canina)',
+        'Vacina Antirrábica': 'Antirrábica',
+      };
+      for (const a of appointments.filter(
+        (x) => x.employeeId === vet.id && x.status === 'concluido',
+      )) {
+        const service = products.find((p) => p.id === a.serviceId)!;
+        const at = new Date(a.endsAt);
+        const recordId = randomUUID();
+        const vaccine = vaccineByService[service.name];
+        const sample = SAMPLE_CASES[int(rand, 0, SAMPLE_CASES.length - 1)]!;
+        records.push({
+          id: recordId,
+          shopId,
+          petId: a.petId,
+          vetId: vet.id,
+          appointmentId: a.id!,
+          kind: vaccine ? 'vacinacao' : 'consulta',
+          at,
+          createdAt: at,
+          weightGrams: Math.max(100, (baseWeight.get(a.petId) ?? 5000) + int(rand, -3, 3) * 50),
+          temperatureDeci: int(rand, 380, 392),
+          complaint: vaccine ? 'Vacinação de reforço.' : sample.complaint,
+          exam: vaccine ? 'Exame físico sem alterações. Apto para vacinação.' : sample.exam,
+          diagnosis: vaccine ? 'Animal hígido.' : sample.diagnosis,
+          treatment: vaccine
+            ? `Aplicada ${vaccine}. Observar o local da aplicação por 48 horas.`
+            : sample.treatment,
+        });
+        if (!vaccine)
+          sample.prescription.forEach((item, position) =>
+            prescriptions.push({ recordId, position, ...item }),
+          );
+        if (vaccine) {
+          const applied = dayOnly(at);
+          vaccinations.push({
+            shopId,
+            petId: a.petId,
+            recordId,
+            vetId: vet.id,
+            vaccine,
+            appliedAt: applied,
+            nextDoseAt: new Date(applied.getTime() + 365 * 86_400_000),
+            batch: `L${int(rand, 1000, 9999)}`,
+            createdAt: applied,
           });
         }
       }
@@ -242,12 +354,16 @@ export class SampleDataService {
             name,
             species,
             breed,
+            ...petHealth.get(c.petIds[i]!),
           })),
         ),
       }),
       this.prisma.sale.createMany({ data: sales }),
       this.prisma.saleItem.createMany({ data: items }),
       this.prisma.appointment.createMany({ data: appointments }),
+      this.prisma.medicalRecord.createMany({ data: records }),
+      this.prisma.prescriptionItem.createMany({ data: prescriptions }),
+      this.prisma.vaccination.createMany({ data: vaccinations }),
       this.prisma.note.createMany({
         data: SAMPLE_NOTES.map((text, i) => ({
           shopId,

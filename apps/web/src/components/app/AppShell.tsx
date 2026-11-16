@@ -9,10 +9,11 @@ import { Logo } from "@/components/Logo";
 import { Avatar } from "@/components/ui";
 import { useSession } from "@/lib/session";
 
-type NavItem = { href: string; label: string; icon: IconName; needs?: keyof typeof PERMISSIONS };
+type NavItem = { href: string; label: string; icon: IconName; needs?: keyof typeof PERMISSIONS; clinic?: true };
 const NAV: NavItem[] = [
   { href: "/app/", label: "Painel", icon: "home" },
   { href: "/app/agenda/", label: "Agenda", icon: "calendar" },
+  { href: "/app/clinica/", label: "Clínica", icon: "stethoscope", clinic: true },
   { href: "/app/vender/", label: "Vender", icon: "cart" },
   { href: "/app/vendas/", label: "Vendas", icon: "receipt" },
   { href: "/app/clientes/", label: "Clientes e pets", icon: "paw" },
@@ -22,7 +23,11 @@ const NAV: NavItem[] = [
   { href: "/app/configuracoes/", label: "Configurações", icon: "settings" },
 ];
 
-const TITLES: Record<string, string> = Object.fromEntries(NAV.map((n) => [n.href, n.label]));
+const TITLES: Record<string, string> = {
+  ...Object.fromEntries(NAV.map((n) => [n.href, n.label])),
+  "/app/clinica/pet/": "Ficha clínica",
+  "/app/clinica/receita/": "Receita",
+};
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { me, ready, restore, logout, can } = useSession();
@@ -59,8 +64,8 @@ export function AppShell({ children }: { children: ReactNode }) {
       <aside className="side" aria-label="Menu do sistema">
         <Link href="/app/" className="brand"><Logo light /></Link>
         <nav>
-          {NAV.filter((n) => !n.needs || can(n.needs)).map((item) => (
-            <Link key={item.href} href={item.href} onClick={() => setOpen(false)} className={`item${path === item.href ? " active" : ""}${item.href === "/app/vender/" ? " cta" : ""}`}>
+          {NAV.filter((n) => (!n.needs || can(n.needs)) && (!n.clinic || me.shop.businessTypes.includes("clinica"))).map((item) => (
+            <Link key={item.href} href={item.href} onClick={() => setOpen(false)} className={`item${path === item.href || (item.href === "/app/clinica/" && path.startsWith("/app/clinica/")) ? " active" : ""}${item.href === "/app/vender/" ? " cta" : ""}`}>
               <Icon name={item.icon} size={20} />
               <span>{item.label}</span>
             </Link>

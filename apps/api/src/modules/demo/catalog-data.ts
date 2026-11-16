@@ -361,3 +361,85 @@ export const PAYMENT_WEIGHTS: [Payment, number][] = [
   ['debito', 18],
   ['dinheiro', 7],
 ];
+
+/** Casos clínicos de exemplo (texto genérico, sem marcas nem doses fixas). */
+export const SAMPLE_CASES: {
+  complaint: string;
+  exam: string;
+  diagnosis: string;
+  treatment: string;
+  prescription: {
+    medication: string;
+    dosage: string;
+    frequency: string;
+    duration: string;
+    instructions: string;
+  }[];
+}[] = [
+  {
+    complaint: 'Coçando e balançando as orelhas há cerca de 5 dias.',
+    exam: 'Conduto auditivo com eritema e secreção escura bilateral. Sem dor à palpação. Restante do exame sem alterações.',
+    diagnosis: 'Otite externa bilateral leve.',
+    treatment: 'Limpeza otológica no consultório. Medicação tópica e retorno em 10 dias.',
+    prescription: [
+      {
+        medication: 'Solução otológica',
+        dosage: '3 gotas em cada orelha',
+        frequency: 'a cada 12 horas',
+        duration: '7 dias',
+        instructions: 'Massagear a base da orelha após aplicar.',
+      },
+      {
+        medication: 'Limpador de ouvido',
+        dosage: 'Quantidade suficiente',
+        frequency: 'a cada 3 dias',
+        duration: '2 semanas',
+        instructions: 'Usar antes da medicação.',
+      },
+    ],
+  },
+  {
+    complaint: 'Check-up anual. Tutor sem queixas.',
+    exam: 'Mucosas normocoradas, hidratação adequada, ausculta cardiopulmonar sem alterações. Tártaro leve.',
+    diagnosis: 'Animal hígido.',
+    treatment: 'Manter alimentação e vermifugação em dia. Avaliar limpeza dentária no próximo ano.',
+    prescription: [],
+  },
+  {
+    complaint: 'Dois episódios de vômito ontem, comendo menos.',
+    exam: 'Abdômen levemente sensível à palpação, sem massas. Hidratação adequada.',
+    diagnosis: 'Gastroenterite leve, provável indiscrição alimentar.',
+    treatment:
+      'Dieta leve fracionada por 3 dias. Retornar se os vômitos voltarem ou se houver apatia.',
+    prescription: [
+      {
+        medication: 'Protetor gástrico',
+        dosage: 'Conforme peso, orientado na consulta',
+        frequency: 'a cada 24 horas',
+        duration: '5 dias',
+        instructions: 'Dar em jejum, 30 minutos antes da refeição.',
+      },
+    ],
+  },
+  {
+    complaint: 'Lesões avermelhadas na barriga e coceira.',
+    exam: 'Pápulas e eritema em região abdominal. Sem pulgas visíveis no momento.',
+    diagnosis: 'Dermatite alérgica, a investigar.',
+    treatment: 'Banho terapêutico semanal e controle de ectoparasitas. Retorno em 15 dias.',
+    prescription: [
+      {
+        medication: 'Xampu terapêutico',
+        dosage: 'Quantidade suficiente',
+        frequency: '1 vez por semana',
+        duration: '4 semanas',
+        instructions: 'Deixar agir 10 minutos antes de enxaguar.',
+      },
+    ],
+  },
+];
+
+/** Vacinas aplicadas nos pets de exemplo, por espécie. */
+export const SAMPLE_VACCINES: Record<'cao' | 'gato', string[]> = {
+  cao: ['V10 (polivalente canina)', 'Antirrábica'],
+  gato: ['V4 (quádrupla felina)', 'Antirrábica'],
+};
