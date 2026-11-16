@@ -1,4 +1,4 @@
-import type { Category, Payment } from '@petsystem/contracts';
+import type { BusinessType, Category, Payment } from '@petsystem/contracts';
 
 /** Produtos de exemplo: nome, categoria, preço e custo em centavos, estoque inicial e mínimo. */
 export const SAMPLE_PRODUCTS: {
@@ -10,6 +10,10 @@ export const SAMPLE_PRODUCTS: {
   minStock: number;
   /** Peso relativo de saída nas vendas geradas. */
   weight: number;
+  /** Duração na agenda (serviços). */
+  durationMinutes?: number;
+  /** Tipo de negócio que oferece o serviço (produtos de prateleira valem para todos). */
+  business?: BusinessType;
 }[] = [
   {
     name: 'Ração Premium Cães Adultos 15 kg',
@@ -208,6 +212,8 @@ export const SAMPLE_PRODUCTS: {
     stock: null,
     minStock: 0,
     weight: 6,
+    durationMinutes: 60,
+    business: 'petshop',
   },
   {
     name: 'Banho e Tosa Porte Médio',
@@ -217,6 +223,8 @@ export const SAMPLE_PRODUCTS: {
     stock: null,
     minStock: 0,
     weight: 4,
+    durationMinutes: 90,
+    business: 'petshop',
   },
   {
     name: 'Tosa Higiênica',
@@ -226,15 +234,78 @@ export const SAMPLE_PRODUCTS: {
     stock: null,
     minStock: 0,
     weight: 3,
+    durationMinutes: 40,
+    business: 'petshop',
+  },
+  {
+    name: 'Diária de Creche',
+    category: 'servico',
+    price: 7500,
+    cost: 2500,
+    stock: null,
+    minStock: 0,
+    weight: 4,
+    durationMinutes: 540,
+    business: 'creche',
+  },
+  {
+    name: 'Meia Diária de Creche',
+    category: 'servico',
+    price: 4500,
+    cost: 1500,
+    stock: null,
+    minStock: 0,
+    weight: 2,
+    durationMinutes: 300,
+    business: 'creche',
+  },
+  {
+    name: 'Consulta Clínica',
+    category: 'servico',
+    price: 15000,
+    cost: 4000,
+    stock: null,
+    minStock: 0,
+    weight: 3,
+    durationMinutes: 30,
+    business: 'clinica',
+  },
+  {
+    name: 'Vacina V10',
+    category: 'servico',
+    price: 9000,
+    cost: 4500,
+    stock: null,
+    minStock: 0,
+    weight: 2,
+    durationMinutes: 20,
+    business: 'clinica',
+  },
+  {
+    name: 'Vacina Antirrábica',
+    category: 'servico',
+    price: 7000,
+    cost: 3000,
+    stock: null,
+    minStock: 0,
+    weight: 2,
+    durationMinutes: 20,
+    business: 'clinica',
   },
 ];
 
-export const SAMPLE_EMPLOYEES = [
+export const SAMPLE_EMPLOYEES: {
+  name: string;
+  role: 'gerente' | 'atendente' | 'banho' | 'veterinario' | 'cuidador';
+  business?: BusinessType;
+}[] = [
   { name: 'Marina Costa', role: 'gerente' },
   { name: 'Diego Ramos', role: 'atendente' },
   { name: 'Lívia Nunes', role: 'atendente' },
-  { name: 'Caio Martins', role: 'banho' },
-] as const;
+  { name: 'Caio Martins', role: 'banho', business: 'petshop' },
+  { name: 'Bianca Rocha', role: 'cuidador', business: 'creche' },
+  { name: 'Dra. Helena Prado', role: 'veterinario', business: 'clinica' },
+];
 
 export const SAMPLE_CLIENTS: {
   name: string;

@@ -90,6 +90,25 @@ export class SalesService {
         throw new AppError(400, ERROR_CODES.INVALID_DISCOUNT, 'O desconto é maior que o subtotal');
       }
 
+      // Atendimentos cobrados nesta venda: precisam ser da loja, não cancelados e ainda não cobrados.
+      if (input.appointmentIds.length) {
+        const ok = await tx.appointment.count({
+          where: {
+            id: { in: input.appointmentIds },
+            shopId,
+            saleId: null,
+            status: { notIn: ['cancelado', 'faltou'] },
+          },
+        });
+        if (ok !== input.appointmentIds.length) {
+          throw new AppError(
+            409,
+            ERROR_CODES.VALIDATION_ERROR,
+            'Um dos atendimentos já foi cobrado ou cancelado',
+          );
+        }
+      }
+
       const { nextSaleNumber } = await tx.shop.update({
         where: { id: shopId },
         data: { nextSaleNumber: { increment: 1 } },
@@ -123,6 +142,12 @@ export class SalesService {
         },
         select: SALE_SELECT,
       });
+      if (input.appointmentIds.length) {
+        await tx.appointment.updateMany({
+          where: { id: { in: input.appointmentIds }, shopId, saleId: null },
+          data: { saleId: sale.id, status: 'concluido' },
+        });
+      }
       await tx.stockMovement.createMany({
         data: input.items
           .filter((i) => byId.get(i.productId)!.stock !== null)

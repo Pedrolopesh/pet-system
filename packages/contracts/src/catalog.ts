@@ -22,10 +22,22 @@ export const productInputSchema = z
     /** Serviços (banho, tosa) não controlam estoque: null. */
     stock: z.number().int().min(0).max(1_000_000).nullable(),
     minStock: z.number().int().min(0).max(1_000_000).default(0),
+    /** Duração padrão na agenda (só serviços). */
+    durationMinutes: z
+      .number()
+      .int()
+      .min(10)
+      .max(12 * 60)
+      .nullable()
+      .default(null),
   })
   .refine((p) => p.category !== 'servico' || p.stock === null, {
     path: ['stock'],
     message: 'serviços não têm estoque',
+  })
+  .refine((p) => p.category === 'servico' || p.durationMinutes === null, {
+    path: ['durationMinutes'],
+    message: 'só serviços têm duração',
   });
 export type ProductInput = z.input<typeof productInputSchema>;
 
@@ -35,6 +47,13 @@ export const productUpdateSchema = z.object({
   price: centsSchema.optional(),
   cost: centsSchema.optional(),
   minStock: z.number().int().min(0).max(1_000_000).optional(),
+  durationMinutes: z
+    .number()
+    .int()
+    .min(10)
+    .max(12 * 60)
+    .nullable()
+    .optional(),
   active: z.boolean().optional(),
 });
 export type ProductUpdate = z.infer<typeof productUpdateSchema>;
@@ -72,5 +91,6 @@ export type Product = {
   cost: number;
   stock: number | null;
   minStock: number;
+  durationMinutes: number | null;
   active: boolean;
 };

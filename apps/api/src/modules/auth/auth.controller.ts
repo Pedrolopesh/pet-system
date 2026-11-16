@@ -1,7 +1,8 @@
-import { Body, Controller, Get, HttpCode, Inject, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Inject, Param, Post } from '@nestjs/common';
 import { SkipThrottle, Throttle } from '@nestjs/throttler';
 import {
   type AuthResponse,
+  inviteAcceptSchema,
   loginSchema,
   type Me,
   refreshSchema,
@@ -43,6 +44,20 @@ export class AuthController {
   @Throttle({ auth: { limit: 20, ttl: 60_000 } })
   demo(): Promise<AuthResponse> {
     return this.auth.loginDemo();
+  }
+
+  @Public()
+  @Get('invites/:token')
+  invitePreview(@Param('token') token: string): Promise<{ shopName: string; role: string }> {
+    return this.auth.invitePreview(token.slice(0, 100));
+  }
+
+  @Public()
+  @Post('invites/accept')
+  acceptInvite(
+    @Body(new ZodValidationPipe(inviteAcceptSchema)) body: z.infer<typeof inviteAcceptSchema>,
+  ): Promise<AuthResponse> {
+    return this.auth.acceptInvite(body);
   }
 
   @Public()

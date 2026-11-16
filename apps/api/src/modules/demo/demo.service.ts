@@ -44,8 +44,9 @@ export class DemoService {
     const passwordHash = await hashPassword(randomBytes(32).toString('base64url'));
     const shop = await this.prisma.shop.create({
       data: {
-        name: 'Pet Shop Patas & Cia',
+        name: 'Patas & Cia',
         isDemo: true,
+        businessTypes: ['petshop', 'creche', 'clinica'],
         users: { create: { name: 'Visitante', email: DEMO_EMAIL, passwordHash } },
       },
       include: { users: { select: { id: true } } },
@@ -62,6 +63,7 @@ export class DemoService {
     });
     if (!shop) return;
     await this.prisma.$transaction([
+      this.prisma.appointment.deleteMany({ where: { shopId: shop.id } }),
       this.prisma.sale.deleteMany({ where: { shopId: shop.id } }),
       this.prisma.stockMovement.deleteMany({ where: { shopId: shop.id } }),
       this.prisma.product.deleteMany({ where: { shopId: shop.id } }),

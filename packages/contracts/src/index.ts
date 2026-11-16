@@ -1,3 +1,4 @@
+export * from './agenda.js';
 export * from './auth.js';
 export * from './catalog.js';
 export * from './common.js';
@@ -6,4 +7,5 @@ export * from './labels.js';
 export * from './money.js';
 export * from './people.js';
 export * from './reports.js';
+export * from './saas.js';
 export * from './sales.js';

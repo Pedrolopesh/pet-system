@@ -18,6 +18,8 @@ export const saleInputSchema = z.object({
   employeeId: z.uuid(),
   payment: paymentSchema,
   discount: centsSchema.default(0),
+  /** Atendimentos da agenda cobrados nesta venda (ficam concluídos e ligados a ela). */
+  appointmentIds: z.array(z.uuid()).max(10).default([]),
 });
 export type SaleInput = z.input<typeof saleInputSchema>;
 
@@ -42,9 +44,17 @@ export type Sale = {
   total: number;
 };
 
+export const NOTE_PRIORITIES = ['urgente', 'importante', 'normal'] as const;
 export const noteInputSchema = z.object({
   text: z.string().trim().min(1).max(200),
   done: z.boolean().default(false),
+  priority: z.enum(NOTE_PRIORITIES).default('normal'),
 });
 export const noteUpdateSchema = noteInputSchema.partial();
-export type Note = { id: string; text: string; done: boolean; createdAt: string };
+export type Note = {
+  id: string;
+  text: string;
+  done: boolean;
+  priority: (typeof NOTE_PRIORITIES)[number];
+  createdAt: string;
+};

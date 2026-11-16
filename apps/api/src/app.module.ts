@@ -9,6 +9,8 @@ import { Logger, LoggerModule } from 'nestjs-pino';
 import { AllExceptionsFilter } from './common/all-exceptions.filter.js';
 import { ENV, type Env } from './config/env.js';
 import { CoreModule } from './core.module.js';
+import { AccountModule } from './modules/account/account.module.js';
+import { AgendaModule } from './modules/agenda/agenda.controller.js';
 import { AuthController } from './modules/auth/auth.controller.js';
 import { AuthModule } from './modules/auth/auth.module.js';
 import { CatalogModule } from './modules/catalog/catalog.module.js';
@@ -80,7 +82,9 @@ const REQUEST_ID = /^[A-Za-z0-9_-]{8,64}$/;
         },
       }),
     }),
+    AccountModule,
     AuthModule,
+    AgendaModule,
     CatalogModule,
     PeopleModule,
     SalesModule,

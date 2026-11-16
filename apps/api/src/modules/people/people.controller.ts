@@ -21,6 +21,7 @@ import {
 import { z } from 'zod';
 
 import type { Principal } from '../../common/jwt-auth.guard.js';
+import { RequiresPermission } from '../../common/permission.decorator.js';
 import { CurrentPrincipal } from '../../common/principal.decorator.js';
 import { ZodValidationPipe } from '../../common/zod-validation.pipe.js';
 import { ClientsService } from './clients.service.js';
@@ -82,6 +83,7 @@ export class EmployeesController {
   }
 
   @Post()
+  @RequiresPermission('manageShop')
   create(
     @CurrentPrincipal() p: Principal,
     @Body(new ZodValidationPipe(employeeInputSchema)) body: z.infer<typeof employeeInputSchema>,
@@ -90,6 +92,7 @@ export class EmployeesController {
   }
 
   @Put(':id')
+  @RequiresPermission('manageShop')
   update(
     @CurrentPrincipal() p: Principal,
     @Param('id', ParseUUIDPipe) id: string,

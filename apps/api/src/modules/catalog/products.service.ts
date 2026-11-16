@@ -23,6 +23,7 @@ const SELECT = {
   cost: true,
   stock: true,
   minStock: true,
+  durationMinutes: true,
   active: true,
 } satisfies Prisma.ProductSelect;
 

@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { requiredText } from './common.js';
+import { BUSINESS_TYPES, type Shop, type UserRole } from './saas.js';
 
 const email = z.string().trim().toLowerCase().pipe(z.email().max(254));
 /** Senha: 8 a 128 caracteres (o limite superior evita hash caro de propósito). */
@@ -11,6 +12,8 @@ export const signupSchema = z.object({
   name: requiredText(80),
   email,
   password,
+  /** Tipos de negócio: definem os serviços de exemplo e o que aparece primeiro no menu. */
+  businessTypes: z.array(z.enum(BUSINESS_TYPES)).min(1).max(3).default(['petshop']),
   /** Preenche a loja nova com produtos, clientes e vendas de exemplo. */
   withSampleData: z.boolean().default(true),
 });
@@ -24,8 +27,8 @@ export const refreshSchema = z.object({ refreshToken: z.string().min(10).max(200
 export type AuthTokens = { accessToken: string; refreshToken: string; expiresIn: number };
 
 export type Me = {
-  user: { id: string; name: string; email: string };
-  shop: { id: string; name: string; isDemo: boolean };
+  user: { id: string; name: string; email: string; role: UserRole };
+  shop: Shop;
 };
 
 export type AuthResponse = AuthTokens & Me;

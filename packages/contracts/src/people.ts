@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { optionalText, requiredText } from './common.js';
 
 export const SPECIES = ['cao', 'gato', 'outro'] as const;
-export const ROLES = ['gerente', 'atendente', 'banho'] as const;
+export const ROLES = ['gerente', 'atendente', 'banho', 'veterinario', 'cuidador'] as const;
 
 /** Telefone brasileiro: só dígitos, 10 ou 11 (com DDD). Vazio é permitido. */
 const phone = z

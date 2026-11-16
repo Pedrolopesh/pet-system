@@ -36,6 +36,42 @@ enum Role {
   gerente
   atendente
   banho
+  veterinario
+  cuidador
+}
+
+enum BusinessType {
+  petshop
+  creche
+  clinica
+}
+
+enum Plan {
+  teste
+  basico
+  pro
+}
+
+enum UserRole {
+  dono
+  gerente
+  atendente
+}
+
+enum AppointmentStatus {
+  agendado
+  confirmado
+  em_atendimento
+  pronto
+  concluido
+  cancelado
+  faltou
+}
+
+enum NotePriority {
+  urgente
+  importante
+  normal
 }
 
 enum StockReason {
@@ -46,21 +82,31 @@ enum StockReason {
 }
 
 model Shop {
-  id             String   @id @default(uuid()) @db.Uuid
-  name           String   @db.VarChar(80)
+  id             String         @id @default(uuid()) @db.Uuid
+  name           String         @db.VarChar(80)
   /// Loja de demonstração pública: restaurada todo dia, sem troca de e-mail ou senha
-  isDemo         Boolean  @default(false) @map("is_demo")
+  isDemo         Boolean        @default(false) @map("is_demo")
   /// Próximo número de venda (sequência por loja)
-  nextSaleNumber Int      @default(1) @map("next_sale_number")
-  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+  nextSaleNumber Int            @default(1) @map("next_sale_number")
+  /// Tipos de negócio da loja (pode ser mais de um: pet shop com banho e creche, por exemplo)
+  businessTypes  BusinessType[] @default([petshop]) @map("business_types")
+  plan           Plan           @default(teste)
+  /// Fim do período de teste (só vale com plan = teste)
+  trialEndsAt    DateTime?      @map("trial_ends_at") @db.Timestamptz
+  /// Horário de funcionamento usado na agenda (HH:MM, fuso da loja)
+  opensAt        String         @default("08:00") @map("opens_at") @db.VarChar(5)
+  closesAt       String         @default("19:00") @map("closes_at") @db.VarChar(5)
+  createdAt      DateTime       @default(now()) @map("created_at") @db.Timestamptz
 
-  users     User[]
-  products  Product[]
-  clients   Client[]
-  employees Employee[]
-  sales     Sale[]
-  notes     Note[]
-  movements StockMovement[]
+  users        User[]
+  products     Product[]
+  clients      Client[]
+  employees    Employee[]
+  sales        Sale[]
+  notes        Note[]
+  movements    StockMovement[]
+  appointments Appointment[]
+  invites      Invite[]
 
   @@map("shops")
 }
@@ -72,6 +118,7 @@ model User {
   email        String    @unique @db.VarChar(254)
   /// argon2id
   passwordHash String    @map("password_hash")
+  role         UserRole  @default(dono)
   createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz
   lastLoginAt  DateTime? @map("last_login_at") @db.Timestamptz
 
@@ -99,21 +146,24 @@ model RefreshToken {
 }
 
 model Product {
-  id        String   @id @default(uuid()) @db.Uuid
-  shopId    String   @map("shop_id") @db.Uuid
-  name      String   @db.VarChar(80)
-  category  Category
-  price     Int
-  cost      Int
+  id              String   @id @default(uuid()) @db.Uuid
+  shopId          String   @map("shop_id") @db.Uuid
+  name            String   @db.VarChar(80)
+  category        Category
+  price           Int
+  cost            Int
   /// null = serviço, sem controle de estoque
-  stock     Int?
-  minStock  Int      @default(0) @map("min_stock")
-  active    Boolean  @default(true)
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz
+  stock           Int?
+  minStock        Int      @default(0) @map("min_stock")
+  /// Duração padrão do serviço na agenda (só para category = servico)
+  durationMinutes Int?     @map("duration_minutes")
+  active          Boolean  @default(true)
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz
 
-  shop      Shop            @relation(fields: [shopId], references: [id], onDelete: Cascade)
-  movements StockMovement[]
+  shop         Shop            @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  movements    StockMovement[]
+  appointments Appointment[]
 
   @@index([shopId, active])
   @@map("products")
@@ -145,9 +195,10 @@ model Client {
   notes     String   @default("") @db.VarChar(500)
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
 
-  shop  Shop   @relation(fields: [shopId], references: [id], onDelete: Cascade)
-  pets  Pet[]
-  sales Sale[]
+  shop         Shop          @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  pets         Pet[]
+  sales        Sale[]
+  appointments Appointment[]
 
   @@index([shopId, name])
   @@map("clients")
@@ -160,7 +211,8 @@ model Pet {
   species  Species
   breed    String  @default("") @db.VarChar(40)
 
-  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  client       Client        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  appointments Appointment[]
 
   @@map("pets")
 }
@@ -172,8 +224,9 @@ model Employee {
   role   Role
   active Boolean @default(true)
 
-  shop  Shop   @relation(fields: [shopId], references: [id], onDelete: Cascade)
-  sales Sale[]
+  shop         Shop          @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  sales        Sale[]
+  appointments Appointment[]
 
   @@map("employees")
 }
@@ -192,10 +245,11 @@ model Sale {
   /// Custo dos itens no momento da venda (para o lucro bruto)
   cost       Int
 
-  shop     Shop       @relation(fields: [shopId], references: [id], onDelete: Cascade)
-  client   Client?    @relation(fields: [clientId], references: [id], onDelete: SetNull)
-  employee Employee   @relation(fields: [employeeId], references: [id], onDelete: Restrict)
-  items    SaleItem[]
+  shop         Shop          @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  client       Client?       @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  employee     Employee      @relation(fields: [employeeId], references: [id], onDelete: Restrict)
+  items        SaleItem[]
+  appointments Appointment[]
 
   @@unique([shopId, number])
   @@index([shopId, at])
@@ -203,15 +257,15 @@ model Sale {
 }
 
 model SaleItem {
-  id        String @id @default(uuid()) @db.Uuid
-  saleId    String @map("sale_id") @db.Uuid
+  id        String   @id @default(uuid()) @db.Uuid
+  saleId    String   @map("sale_id") @db.Uuid
   /// Sem FK: o histórico da venda continua mesmo se o produto mudar de nome
-  productId String @map("product_id") @db.Uuid
-  name      String @db.VarChar(80)
+  productId String   @map("product_id") @db.Uuid
+  name      String   @db.VarChar(80)
   category  Category
   qty       Int
-  unitPrice Int    @map("unit_price")
-  unitCost  Int    @map("unit_cost")
+  unitPrice Int      @map("unit_price")
+  unitCost  Int      @map("unit_cost")
 
   sale Sale @relation(fields: [saleId], references: [id], onDelete: Cascade)
 
@@ -220,14 +274,64 @@ model SaleItem {
 }
 
 model Note {
-  id        String   @id @default(uuid()) @db.Uuid
-  shopId    String   @map("shop_id") @db.Uuid
-  text      String   @db.VarChar(200)
-  done      Boolean  @default(false)
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  id        String       @id @default(uuid()) @db.Uuid
+  shopId    String       @map("shop_id") @db.Uuid
+  text      String       @db.VarChar(200)
+  done      Boolean      @default(false)
+  priority  NotePriority @default(normal)
+  createdAt DateTime     @default(now()) @map("created_at") @db.Timestamptz
 
   shop Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
 
   @@index([shopId])
   @@map("notes")
+}
+
+/// Atendimento agendado (banho, tosa, consulta, vacina, diária de creche...).
+model Appointment {
+  id         String            @id @default(uuid()) @db.Uuid
+  shopId     String            @map("shop_id") @db.Uuid
+  clientId   String            @map("client_id") @db.Uuid
+  petId      String            @map("pet_id") @db.Uuid
+  /// Serviço (produto da categoria "servico"); define preço e duração padrão
+  serviceId  String            @map("service_id") @db.Uuid
+  /// Profissional; sem profissional, o horário não bloqueia ninguém
+  employeeId String?           @map("employee_id") @db.Uuid
+  startsAt   DateTime          @map("starts_at") @db.Timestamptz
+  endsAt     DateTime          @map("ends_at") @db.Timestamptz
+  status     AppointmentStatus @default(agendado)
+  /// Preço combinado (centavos), copiado do serviço na criação
+  price      Int
+  notes      String            @default("") @db.VarChar(500)
+  /// Venda que cobrou este atendimento
+  saleId     String?           @map("sale_id") @db.Uuid
+  createdAt  DateTime          @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt  DateTime          @updatedAt @map("updated_at") @db.Timestamptz
+
+  shop     Shop      @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  client   Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  pet      Pet       @relation(fields: [petId], references: [id], onDelete: Cascade)
+  service  Product   @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+  employee Employee? @relation(fields: [employeeId], references: [id], onDelete: SetNull)
+  sale     Sale?     @relation(fields: [saleId], references: [id], onDelete: SetNull)
+
+  @@index([shopId, startsAt])
+  @@index([employeeId, startsAt])
+  @@map("appointments")
+}
+
+/// Convite para entrar na equipe da loja. Só o hash do token fica salvo; vale uma vez.
+model Invite {
+  id        String    @id @default(uuid()) @db.Uuid
+  shopId    String    @map("shop_id") @db.Uuid
+  role      UserRole
+  tokenHash String    @unique @map("token_hash") @db.VarChar(64)
+  expiresAt DateTime  @map("expires_at") @db.Timestamptz
+  usedAt    DateTime? @map("used_at") @db.Timestamptz
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
+
+  shop Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@index([shopId])
+  @@map("invites")
 }

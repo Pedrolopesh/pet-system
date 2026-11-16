@@ -19,6 +19,7 @@ import {
 import type { z } from 'zod';
 
 import type { Principal } from '../../common/jwt-auth.guard.js';
+import { RequiresPermission } from '../../common/permission.decorator.js';
 import { CurrentPrincipal } from '../../common/principal.decorator.js';
 import { ZodValidationPipe } from '../../common/zod-validation.pipe.js';
 import { ProductsService } from './products.service.js';
@@ -36,6 +37,7 @@ export class ProductsController {
   }
 
   @Post()
+  @RequiresPermission('manageShop')
   create(
     @CurrentPrincipal() p: Principal,
     @Body(new ZodValidationPipe(productInputSchema)) body: z.infer<typeof productInputSchema>,
@@ -44,6 +46,7 @@ export class ProductsController {
   }
 
   @Patch(':id')
+  @RequiresPermission('manageShop')
   update(
     @CurrentPrincipal() p: Principal,
     @Param('id', ParseUUIDPipe) id: string,
@@ -53,6 +56,7 @@ export class ProductsController {
   }
 
   @Post(':id/stock')
+  @RequiresPermission('manageShop')
   adjust(
     @CurrentPrincipal() p: Principal,
     @Param('id', ParseUUIDPipe) id: string,

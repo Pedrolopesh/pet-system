@@ -7,6 +7,7 @@ import { notFound } from '../../common/not-found.js';
 import { startOfLocalMonth } from '../../common/time.js';
 import { ENV, type Env } from '../../config/env.js';
 import { PrismaService } from '../../prisma/prisma.service.js';
+import { PlansService } from '../account/plans.service.js';
 
 @Injectable()
 export class EmployeesService {
@@ -14,6 +15,7 @@ export class EmployeesService {
     @Inject(PrismaService) private readonly prisma: PrismaService,
     @Inject(Clock) private readonly clock: Clock,
     @Inject(ENV) private readonly env: Env,
+    @Inject(PlansService) private readonly plans: PlansService,
   ) {}
 
   async list(shopId: string): Promise<Employee[]> {
@@ -42,6 +44,7 @@ export class EmployeesService {
   }
 
   async create(shopId: string, input: z.infer<typeof employeeInputSchema>): Promise<Employee> {
+    if (input.active) await this.plans.assertRoom(shopId, 'professionals');
     const e = await this.prisma.employee.create({ data: { ...input, shopId } });
     return {
       id: e.id,

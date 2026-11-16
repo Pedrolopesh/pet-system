@@ -4,11 +4,13 @@ import type { z } from 'zod';
 
 import { Clock } from '../../common/clock.js';
 import type { Principal } from '../../common/jwt-auth.guard.js';
+import { RequiresPermission } from '../../common/permission.decorator.js';
 import { CurrentPrincipal } from '../../common/principal.decorator.js';
 import { startOfLocalDay, startOfLocalMonth } from '../../common/time.js';
 import { ZodValidationPipe } from '../../common/zod-validation.pipe.js';
 import { ENV, type Env } from '../../config/env.js';
 import { PrismaService } from '../../prisma/prisma.service.js';
+import { PlansService } from '../account/plans.service.js';
 import { SALE_SELECT, toSale } from '../sales/sales.service.js';
 import { buildReport, revenueByDay } from './build-report.js';
 
@@ -122,13 +124,18 @@ export class ReportsService {
 
 @Controller()
 export class ReportsController {
-  constructor(@Inject(ReportsService) private readonly reports: ReportsService) {}
+  constructor(
+    @Inject(ReportsService) private readonly reports: ReportsService,
+    @Inject(PlansService) private readonly plans: PlansService,
+  ) {}
 
   @Get('reports')
-  report(
+  @RequiresPermission('manageShop')
+  async report(
     @CurrentPrincipal() p: Principal,
     @Query(new ZodValidationPipe(reportQuerySchema)) query: z.infer<typeof reportQuerySchema>,
   ): Promise<Report> {
+    await this.plans.assertReports(p.shopId);
     return this.reports.report(p.shopId, query.days);
   }
 

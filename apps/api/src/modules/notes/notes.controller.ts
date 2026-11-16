@@ -22,7 +22,13 @@ import { CurrentPrincipal } from '../../common/principal.decorator.js';
 import { ZodValidationPipe } from '../../common/zod-validation.pipe.js';
 import { PrismaService } from '../../prisma/prisma.service.js';
 
-const toNote = (n: { id: string; text: string; done: boolean; createdAt: Date }): Note => ({
+const toNote = (n: {
+  id: string;
+  text: string;
+  done: boolean;
+  priority: Note['priority'];
+  createdAt: Date;
+}): Note => ({
   ...n,
   createdAt: n.createdAt.toISOString(),
 });
@@ -35,7 +41,7 @@ export class NotesService {
   async list(shopId: string): Promise<Note[]> {
     const rows = await this.prisma.note.findMany({
       where: { shopId },
-      orderBy: [{ done: 'asc' }, { createdAt: 'desc' }],
+      orderBy: [{ done: 'asc' }, { priority: 'asc' }, { createdAt: 'desc' }],
       take: 50,
     });
     return rows.map(toNote);
