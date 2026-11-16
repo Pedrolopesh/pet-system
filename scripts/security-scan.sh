@@ -16,7 +16,7 @@ echo "==> Arquivos sensíveis versionados"
 if echo "$files" | grep -E '(^|/)\.env($|\.)|\.pem$|\.p12$|id_rsa|id_ed25519|credentials' | grep -v -E '\.env\.(example|production)$'; then fail=1; fi
 
 echo "==> IPs e hosts de infraestrutura"
-if echo "$files" | xargs grep -n -I -E '\b([0-9]{1,3}\.){3}[0-9]{1,3}\b' 2>/dev/null | grep -v -E '127\.0\.0\.1|0\.0\.0\.0'; then fail=1; fi
+if echo "$files" | xargs grep -n -I -E '\b([0-9]{1,3}\.){3}[0-9]{1,3}\b' 2>/dev/null | grep -v -E '127\.0\.0\.1|0\.0\.0\.0|172\.17\.0\.1'; then fail=1; fi
 
 echo "==> Vulnerabilidades em dependências (pnpm audit)"
 pnpm audit --prod --audit-level=high || fail=1
