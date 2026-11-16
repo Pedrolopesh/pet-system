@@ -1,6 +1,10 @@
 import { z } from 'zod';
 
 import { centsSchema, requiredText } from './common.js';
+import type { ROLES } from './people.js';
+
+/** Quem pode executar um serviço agendado online. */
+export const PERFORMER_ROLES = ['banho', 'veterinario', 'cuidador'] as const;
 
 export const CATEGORIES = [
   'racao',
@@ -30,6 +34,9 @@ export const productInputSchema = z
       .max(12 * 60)
       .nullable()
       .default(null),
+    /** Aparece no agendamento online e quem executa (só serviços). */
+    onlineBooking: z.boolean().default(false),
+    performerRole: z.enum(PERFORMER_ROLES).nullable().default(null),
   })
   .refine((p) => p.category !== 'servico' || p.stock === null, {
     path: ['stock'],
@@ -54,6 +61,8 @@ export const productUpdateSchema = z.object({
     .max(12 * 60)
     .nullable()
     .optional(),
+  onlineBooking: z.boolean().optional(),
+  performerRole: z.enum(PERFORMER_ROLES).nullable().optional(),
   active: z.boolean().optional(),
 });
 export type ProductUpdate = z.infer<typeof productUpdateSchema>;
@@ -92,5 +101,8 @@ export type Product = {
   stock: number | null;
   minStock: number;
   durationMinutes: number | null;
+  onlineBooking: boolean;
+  /** Validado na entrada como um dos PERFORMER_ROLES. */
+  performerRole: (typeof ROLES)[number] | null;
   active: boolean;
 };

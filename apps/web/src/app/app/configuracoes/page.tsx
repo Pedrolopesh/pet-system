@@ -2,6 +2,7 @@
 
 import type { Account, BusinessType, InviteLink } from "@petsystem/contracts";
 import { BUSINESS_TYPES, brl, LABELS, PLAN_INFO, PLAN_LIMITS } from "@petsystem/contracts";
+import { BookingSettingsCard } from "@/components/app/BookingSettingsCard";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { Icon } from "@/components/Icon";
 import { Avatar, Skeletons } from "@/components/ui";
@@ -109,6 +110,8 @@ export default function SettingsPage() {
           {manager && <div className="full form-actions"><button className="btn" disabled={saving}>{saving ? "Salvando..." : "Salvar"}</button></div>}
         </form>
       </section>
+
+      <BookingSettingsCard shop={account.shop} canEdit={manager && !me.shop.isDemo} onSaved={async () => (await reload(), load())} />
 
       <section className="card panel rise" id="plano">
         <header>

@@ -7,6 +7,8 @@ import {
   productInputSchema,
   saleInputSchema,
   signupSchema,
+  slugify,
+  slugSchema,
   stockAdjustSchema,
   toMoneyInput,
 } from './index.js';
@@ -76,5 +78,22 @@ describe('schemas', () => {
   });
   it('ajuste de estoque não aceita zero', () => {
     expect(stockAdjustSchema.safeParse({ delta: 0, reason: 'entrada' }).success).toBe(false);
+  });
+});
+
+describe('endereço público da loja', () => {
+  it('gera a partir do nome, sem acentos nem símbolos', () => {
+    expect(slugify('Pet Shop Patas & Cia')).toBe('pet-shop-patas-cia');
+    expect(slugify('Clínica Veterinária São João')).toBe('clinica-veterinaria-sao-joao');
+    expect(slugify('Au')).toBe('loja-au');
+    expect(
+      slugSchema.safeParse(slugify('Um nome muito comprido de pet shop que não acaba nunca'))
+        .success,
+    ).toBe(true);
+  });
+  it('valida o formato', () => {
+    expect(slugSchema.safeParse('patas-e-cia').success).toBe(true);
+    for (const bad of ['ab', '-abc', 'abc-', 'com espaco', 'ÇÃO'])
+      expect(slugSchema.safeParse(bad).success).toBe(false);
   });
 });

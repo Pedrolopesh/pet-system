@@ -19,6 +19,7 @@ import { HealthModule } from './modules/health/health.controller.js';
 import { MaintenanceModule } from './modules/maintenance.module.js';
 import { NotesModule } from './modules/notes/notes.controller.js';
 import { PeopleModule } from './modules/people/people.module.js';
+import { PortalModule } from './modules/portal/portal.module.js';
 import { ReportsModule } from './modules/reports/reports.controller.js';
 import { SalesModule } from './modules/sales/sales.module.js';
 import { PrismaModule } from './prisma/prisma.module.js';
@@ -89,6 +90,7 @@ const REQUEST_ID = /^[A-Za-z0-9_-]{8,64}$/;
     CatalogModule,
     ClinicModule,
     PeopleModule,
+    PortalModule,
     SalesModule,
     NotesModule,
     ReportsModule,

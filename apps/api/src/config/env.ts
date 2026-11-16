@@ -28,6 +28,9 @@ const envSchema = z.object({
   THROTTLE_AUTH_LIMIT: z.coerce.number().int().positive().default(10),
   /** Restaura a loja de demonstração todo dia às 4h (horário de Brasília). */
   DEMO_DAILY_RESET: bool('true'),
+  /** E-mail transacional (Resend). Sem chave, nada é enviado (desenvolvimento). */
+  RESEND_API_KEY: z.preprocess(emptyToUndefined, z.string().min(1).optional()),
+  MAIL_FROM: z.string().default('Pet System <no-reply@example.com>'),
   /** Fuso usado para agrupar vendas por dia nos relatórios. */
   SHOP_TIMEZONE: z.preprocess(emptyToUndefined, z.string().default('America/Sao_Paulo')),
 });

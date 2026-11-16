@@ -10,6 +10,7 @@ import type {
   Vaccination,
   VaccinationInput,
   Appointment,
+  BookingSettings,
   AppointmentInput,
   AppointmentStatus,
   AppointmentUpdate,
@@ -60,6 +61,7 @@ export const authApi = {
 export const accountApi = {
   get: () => request<Account>("/account"),
   updateShop: (body: ShopSettings) => request<Shop>("/account/shop", json("PATCH", body)),
+  updateBooking: (body: BookingSettings) => request<Shop>("/account/booking", json("PATCH", body)),
   changePlan: (plan: "basico" | "pro") => request<Shop>("/account/plan", json("POST", { plan })),
   invite: (role: "gerente" | "atendente") => request<InviteLink>("/account/invites", json("POST", { role })),
   revokeInvite: (id: string) => request<void>(`/account/invites/${id}`, json("DELETE")),

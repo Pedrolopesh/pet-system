@@ -8,6 +8,7 @@ SaaS de gestão para **pet shops, creches e clínicas veterinárias**: agenda se
 
 - **Agenda** por profissional (dia e semana): banho, tosa, consulta, vacina e diária de creche, com duração do serviço. Dois atendimentos do mesmo profissional no mesmo horário não passam, nem com pedidos simultâneos. Fluxo de status: agendado → confirmado → em atendimento → pronto para buscar → concluído (ou cancelado/faltou).
 - **Clínica:** prontuário por pet (queixa, exame, diagnóstico, conduta, peso e temperatura), receita para imprimir, ficha de saúde com alergias em destaque, vacinas com reforço sugerido e lista de reforços vencidos e a vencer com lembrete pelo WhatsApp. Registros do prontuário não são apagados e só podem ser corrigidos nas primeiras 24 horas.
+- **Portal do tutor:** página pública de agendamento por loja (`/agendar/?loja=...`) com os horários realmente livres de cada serviço; login sem senha por código de 6 dígitos no e-mail; área do tutor com próximos atendimentos (cancelamento dentro do prazo da loja), pets, vacinas e histórico. A loja escolhe quais serviços aparecem online, quem executa cada um, a antecedência e o prazo de cancelamento; na agenda, o que veio do portal aparece como "online".
 - **Caixa** que cobra os atendimentos do dia junto com produtos; o atendimento fica concluído e ligado à venda.
 - **Clientes e pets**, **produtos e estoque** com alerta de mínimo, **relatórios** com exportação CSV.
 - **SaaS:** cada conta é uma loja isolada; teste grátis de 14 dias; planos Básico e Pro com limites (usuários, profissionais, relatórios); papéis dono, gerente e atendente; convite por link de uso único.
@@ -29,7 +30,7 @@ O Pet System foi meu primeiro projeto (2022): HTML, CSS e JavaScript puros, com 
 | Login | comparação de senha no navegador | argon2id, JWT de 15 min e refresh rotativo com detecção de reuso |
 | Agenda | não existia | por profissional, sem conflito, com fluxo de status |
 | Estoque | podia ficar negativo | baixa atômica com UPDATE condicional, mesmo com vendas simultâneas |
-| Testes | nenhum | unitários + 42 e2e da API em Postgres real + testes do web |
+| Testes | nenhum | unitários + 55 e2e da API em Postgres real + testes do web |
 | Mídia | vídeo de 17,8 MB | 922 KB |
 
 ## Estrutura
@@ -69,6 +70,7 @@ pnpm verify    # lint + tipos + testes + build + e2e da API + varredura de segur
 
 - Toda rota da API nasce protegida (guard global); a loja e o papel vêm do banco, nunca do corpo da requisição.
 - Permissões por papel no servidor (o front só esconde botões); convites guardados só como hash e de uso único.
+- Portal do tutor com token próprio (não abre a área da loja, e vice-versa); código de login guardado só como hash, vale 10 minutos e 5 tentativas, com a mesma resposta exista ou não o e-mail.
 - Senhas com argon2id (parâmetros da OWASP); login com tempo constante para não revelar e-mails cadastrados.
 - Refresh token opaco, salvo só como hash, rotativo; reusar um token antigo encerra a sessão inteira.
 - Rate limit por IP (geral e mais rígido no login), helmet, CORS por lista, logs sem corpo de requisição e com dados sensíveis mascarados.

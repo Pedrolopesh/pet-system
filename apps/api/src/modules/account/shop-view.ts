@@ -11,6 +11,11 @@ export const SHOP_SELECT = {
   trialEndsAt: true,
   opensAt: true,
   closesAt: true,
+  slug: true,
+  bookingEnabled: true,
+  bookingNoticeHours: true,
+  cancelNoticeHours: true,
+  bookingWindowDays: true,
 } satisfies Prisma.ShopSelect;
 
 export const toShop = (s: Prisma.ShopGetPayload<{ select: typeof SHOP_SELECT }>): Shop => ({

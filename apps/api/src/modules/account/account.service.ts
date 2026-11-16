@@ -3,6 +3,7 @@ import { createHash, randomBytes } from 'node:crypto';
 import { Inject, Injectable } from '@nestjs/common';
 import {
   type Account,
+  type BookingSettings,
   ERROR_CODES,
   type InviteLink,
   type Shop,
@@ -64,6 +65,29 @@ export class AccountService {
       select: SHOP_SELECT,
     });
     return toShop(shop);
+  }
+
+  /** Agendamento online: endereço público, liga/desliga e prazos. */
+  async updateBooking(p: Principal, input: BookingSettings): Promise<Shop> {
+    // Na demo o link é público e compartilhado: ninguém troca o endereço nem desliga.
+    if (p.isDemo) throw demoReadOnly();
+    try {
+      const shop = await this.prisma.shop.update({
+        where: { id: p.shopId },
+        data: defined(input),
+        select: SHOP_SELECT,
+      });
+      return toShop(shop);
+    } catch (error) {
+      if ((error as { code?: unknown }).code === 'P2002') {
+        throw new AppError(
+          409,
+          ERROR_CODES.SLUG_TAKEN,
+          'Esse endereço já está em uso por outra loja',
+        );
+      }
+      throw error;
+    }
   }
 
   /** Troca de plano. A cobrança ainda não está ligada: aqui só muda o plano e os limites. */

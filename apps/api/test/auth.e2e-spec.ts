@@ -123,6 +123,14 @@ describe('autenticação', () => {
       .set(...bearer(res.body))
       .expect(200);
     expect(products.body.length).toBeGreaterThan(10);
+    // O link público da demo não pode ser trocado nem desligado por visitantes
+    const locked = await ctx
+      .http()
+      .patch('/v1/account/booking')
+      .set(...bearer(res.body))
+      .send({ bookingEnabled: false })
+      .expect(403);
+    expect(locked.body.code).toBe('DEMO_READ_ONLY');
     // Ninguém cadastra o e-mail reservado da demo
     await ctx
       .http()

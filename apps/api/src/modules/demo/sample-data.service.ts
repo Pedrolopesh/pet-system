@@ -156,7 +156,8 @@ export class SampleDataService {
           const service = offer[int(rand, 0, offer.length - 1)]!;
           const start = at(day, Math.floor(minute / 60), minute % 60);
           const end = new Date(start.getTime() + service.durationMinutes! * 60_000);
-          if (rand() < 0.8) {
+          // Dias que já passaram ficam cheios; os próximos têm folga para testar o agendamento online.
+          if (rand() < (d > 0 ? 0.4 : 0.8)) {
             const { client, petId } = pick();
             appointments.push({
               id: randomUUID(),
@@ -328,6 +329,10 @@ export class SampleDataService {
           cost: p.cost,
           minStock: p.minStock,
           durationMinutes: p.durationMinutes ?? null,
+          // Serviços já entram no agendamento online, com quem executa cada um.
+          onlineBooking: p.category === 'servico',
+          performerRole:
+            p.business === 'petshop' ? 'banho' : p.business === 'clinica' ? 'veterinario' : null,
           stock:
             p.stock === null
               ? null

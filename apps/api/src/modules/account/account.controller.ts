@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common';
 import {
   type Account,
+  bookingSettingsSchema,
   inviteCreateSchema,
   type InviteLink,
   planChangeSchema,
@@ -44,6 +45,15 @@ export class AccountController {
     @Body(new ZodValidationPipe(shopSettingsSchema)) body: z.infer<typeof shopSettingsSchema>,
   ): Promise<Shop> {
     return this.account.updateShop(p, body);
+  }
+
+  @Patch('booking')
+  @RequiresPermission('manageShop')
+  updateBooking(
+    @CurrentPrincipal() p: Principal,
+    @Body(new ZodValidationPipe(bookingSettingsSchema)) body: z.infer<typeof bookingSettingsSchema>,
+  ): Promise<Shop> {
+    return this.account.updateBooking(p, body);
   }
 
   @Post('plan')

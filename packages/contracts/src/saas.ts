@@ -98,6 +98,11 @@ export type Shop = {
   trialEndsAt: string | null;
   opensAt: string;
   closesAt: string;
+  slug: string | null;
+  bookingEnabled: boolean;
+  bookingNoticeHours: number;
+  cancelNoticeHours: number;
+  bookingWindowDays: number;
 };
 
 export type Member = {

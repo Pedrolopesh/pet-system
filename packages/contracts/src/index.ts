@@ -7,6 +7,7 @@ export * from './errors.js';
 export * from './labels.js';
 export * from './money.js';
 export * from './people.js';
+export * from './portal.js';
 export * from './reports.js';
 export * from './saas.js';
 export * from './sales.js';

@@ -24,6 +24,8 @@ const SELECT = {
   stock: true,
   minStock: true,
   durationMinutes: true,
+  onlineBooking: true,
+  performerRole: true,
   active: true,
 } satisfies Prisma.ProductSelect;
 
@@ -50,7 +52,16 @@ export class ProductsService {
 
   async create(shopId: string, input: z.infer<typeof productInputSchema>): Promise<Product> {
     return this.prisma.$transaction(async (tx) => {
-      const product = await tx.product.create({ data: { ...input, shopId }, select: SELECT });
+      const service = input.category === 'servico';
+      const product = await tx.product.create({
+        data: {
+          ...input,
+          onlineBooking: service && input.onlineBooking,
+          performerRole: service ? input.performerRole : null,
+          shopId,
+        },
+        select: SELECT,
+      });
       if (input.stock) {
         await tx.stockMovement.create({
           data: { shopId, productId: product.id, delta: input.stock, reason: 'entrada' },

@@ -28,6 +28,13 @@ export const ERROR_CODES = {
   INVALID_INVITE: 'INVALID_INVITE',
   /** Registro do prontuário fora da janela de correção. */
   RECORD_LOCKED: 'RECORD_LOCKED',
+  /** Código do portal do tutor errado, vencido ou com tentativas esgotadas. */
+  INVALID_CODE: 'INVALID_CODE',
+  /** Agendamento online desligado ou loja inexistente. */
+  BOOKING_DISABLED: 'BOOKING_DISABLED',
+  /** Fora do prazo da loja (antecedência para agendar ou cancelar). */
+  TOO_LATE: 'TOO_LATE',
+  SLUG_TAKEN: 'SLUG_TAKEN',
   INTERNAL_ERROR: 'INTERNAL_ERROR',
 } as const;
 

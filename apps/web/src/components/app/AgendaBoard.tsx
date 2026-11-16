@@ -103,7 +103,7 @@ export function AgendaBoard() {
   const card = (a: Appointment, style?: CSSProperties) => (
     <button key={a.id} className={`appt st-${a.status}`} style={style} onClick={() => setOpen(a)}>
       <span className="t num">{hhmm(minuteOfDay(a.startsAt))}</span>
-      <strong>{a.pet.name}</strong>
+      <strong>{a.pet.name}{a.source === "online" && <span className="online-dot" title="Agendado pelo tutor">online</span>}</strong>
       <small>{a.service.name}</small>
     </button>
   );
@@ -182,7 +182,7 @@ export function AgendaBoard() {
                     <button className={`list-appt st-${a.status}`} onClick={() => setOpen(a)}>
                       <span className="t num">{hhmm(minuteOfDay(a.startsAt))}</span>
                       <div>
-                        <strong>{a.pet.name} <small className="muted">· {a.client.name}</small></strong>
+                        <strong>{a.pet.name} <small className="muted">· {a.client.name}</small>{a.source === "online" && <span className="online-dot">online</span>}</strong>
                         <small>{a.service.name}{a.employee ? ` · ${a.employee.name}` : ""}</small>
                       </div>
                       <span className="badge gray">{LABELS.status[a.status]}</span>

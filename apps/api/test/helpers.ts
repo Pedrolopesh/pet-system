@@ -7,6 +7,7 @@ import request from 'supertest';
 
 import { AppModule } from '../src/app.module.js';
 import { Clock } from '../src/common/clock.js';
+import { type Mail, Mailer } from '../src/common/mailer.js';
 import { PrismaService } from '../src/prisma/prisma.service.js';
 import { setupApp } from '../src/setup-app.js';
 
@@ -22,10 +23,26 @@ export class TestClock extends Clock {
   }
 }
 
+/** E-mail capturado pelo teste (nada é enviado de verdade). */
+export class FakeMailer extends Mailer {
+  readonly sent: Mail[] = [];
+  send(message: Mail): Promise<void> {
+    this.sent.push(message);
+    return Promise.resolve();
+  }
+  lastCode(to: string): string | undefined {
+    return [...this.sent]
+      .reverse()
+      .find((m) => m.to === to)
+      ?.text.match(/é (\d{6})\./)?.[1];
+  }
+}
+
 export type Ctx = {
   app: INestApplication;
   prisma: PrismaService;
   clock: TestClock;
+  mailer: FakeMailer;
   http: () => ReturnType<typeof request>;
 };
 
@@ -34,14 +51,23 @@ export const NOW = '2026-11-10T15:00:00Z';
 
 export async function createTestApp(): Promise<Ctx> {
   const clock = new TestClock(new Date(NOW));
+  const mailer = new FakeMailer();
   const moduleRef = await Test.createTestingModule({ imports: [AppModule] })
     .overrideProvider(Clock)
     .useValue(clock)
+    .overrideProvider(Mailer)
+    .useValue(mailer)
     .compile();
   const app = moduleRef.createNestApplication({ bufferLogs: true });
   setupApp(app);
   await app.init();
-  return { app, clock, prisma: app.get(PrismaService), http: () => request(app.getHttpServer()) };
+  return {
+    app,
+    clock,
+    mailer,
+    prisma: app.get(PrismaService),
+    http: () => request(app.getHttpServer()),
+  };
 }
 
 /** Senhas falsas usadas só nos testes. */

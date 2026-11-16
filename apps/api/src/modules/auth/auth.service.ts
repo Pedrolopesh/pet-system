@@ -6,6 +6,7 @@ import {
   type LoginInput,
   type Me,
   type signupSchema,
+  slugify,
   TRIAL_DAYS,
   type UserRole,
 } from '@petsystem/contracts';
@@ -54,6 +55,7 @@ export class AuthService {
       const shop = await this.prisma.shop.create({
         data: {
           name: input.shopName,
+          slug: await this.freeSlug(input.shopName),
           businessTypes: input.businessTypes,
           trialEndsAt: new Date(this.clock.now().getTime() + TRIAL_DAYS * 86_400_000),
           users: { create: { name: input.name, email: input.email, passwordHash, role: 'dono' } },
@@ -161,6 +163,20 @@ export class AuthService {
     });
     if (!invite || invite.usedAt || invite.expiresAt <= this.clock.now()) throw invalidInvite();
     return invite;
+  }
+
+  /** Endereço público livre: o nome da loja e, se já existir, um número no fim. */
+  private async freeSlug(name: string): Promise<string> {
+    const base = slugify(name);
+    for (let n = 0; n < 50; n++) {
+      const candidate = n === 0 ? base : `${base.slice(0, 36)}-${n + 1}`;
+      const taken = await this.prisma.shop.findUnique({
+        where: { slug: candidate },
+        select: { id: true },
+      });
+      if (!taken) return candidate;
+    }
+    return `${base.slice(0, 30)}-${Date.now().toString(36)}`;
   }
 
   private async session(userId: string): Promise<AuthResponse> {

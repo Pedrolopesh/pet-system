@@ -14,7 +14,7 @@ const FAQ = [
   { q: "Preciso de cartão para testar?", a: `Não. Você usa tudo do plano Pro por ${TRIAL_DAYS} dias. Depois escolhe o plano que fizer sentido.` },
   { q: "O que acontece quando o teste acaba?", a: "Sua loja continua funcionando com os limites do Básico até você escolher um plano. Nada é apagado." },
   { q: "Posso usar para pet shop e creche ao mesmo tempo?", a: "Pode. No cadastro você marca todos os tipos de negócio, e a agenda e os serviços se ajustam." },
-  { q: "Meus clientes conseguem agendar sozinhos?", a: "Ainda não. O agendamento online pelo tutor está nos próximos passos do produto." },
+  { q: "Meus clientes conseguem agendar sozinhos?", a: "Sim. Ligue o agendamento online nas configurações e compartilhe o link: o tutor escolhe o serviço, vê os horários livres e entra com um código no e-mail, sem senha." },
 ];
 
 export default function Pricing() {

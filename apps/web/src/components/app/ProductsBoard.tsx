@@ -1,7 +1,7 @@
 "use client";
 
 import type { Category, Product, StockAdjust } from "@petsystem/contracts";
-import { CATEGORIES, LABELS, parseMoney, toMoneyInput } from "@petsystem/contracts";
+import { CATEGORIES, LABELS, parseMoney, PERFORMER_ROLES, toMoneyInput } from "@petsystem/contracts";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState, type CSSProperties, type FormEvent } from "react";
 import { Icon } from "@/components/Icon";
@@ -13,7 +13,7 @@ import { friendly } from "@/lib/messages";
 import { useSession } from "@/lib/session";
 import { useToast } from "@/lib/toast";
 
-const EMPTY = { name: "", category: "racao" as Category, price: "", cost: "", stock: "0", minStock: "0", duration: "60" };
+const EMPTY = { name: "", category: "racao" as Category, price: "", cost: "", stock: "0", minStock: "0", duration: "60", online: false, performer: "" };
 
 export function ProductsBoard() {
   const params = useSearchParams();
@@ -52,7 +52,7 @@ export function ProductsBoard() {
     setEditing(p ?? null);
     setForm(
       p
-        ? { name: p.name, category: p.category, price: toMoneyInput(p.price), cost: toMoneyInput(p.cost), stock: String(p.stock ?? 0), minStock: String(p.minStock), duration: String(p.durationMinutes ?? 60) }
+        ? { name: p.name, category: p.category, price: toMoneyInput(p.price), cost: toMoneyInput(p.cost), stock: String(p.stock ?? 0), minStock: String(p.minStock), duration: String(p.durationMinutes ?? 60), online: p.onlineBooking, performer: p.performerRole ?? "" }
         : EMPTY,
     );
     setFormError("");
@@ -67,11 +67,13 @@ export function ProductsBoard() {
     const service = form.category === "servico";
     const minStock = service ? 0 : Math.max(0, Math.trunc(Number(form.minStock) || 0));
     const durationMinutes = service ? Math.max(10, Math.trunc(Number(form.duration) || 60)) : null;
+    const onlineBooking = service && form.online;
+    const performerRole = service && form.performer ? (form.performer as (typeof PERFORMER_ROLES)[number]) : null;
     setSaving(true);
     setFormError("");
     try {
       if (editing) {
-        replace(await productsApi.update(editing.id, { name: form.name, category: form.category, price, cost, minStock, durationMinutes }));
+        replace(await productsApi.update(editing.id, { name: form.name, category: form.category, price, cost, minStock, durationMinutes, onlineBooking, performerRole }));
         toast("Produto atualizado.");
       } else {
         const created = await productsApi.create({
@@ -82,6 +84,8 @@ export function ProductsBoard() {
           stock: service ? null : Math.max(0, Math.trunc(Number(form.stock) || 0)),
           minStock,
           durationMinutes,
+          onlineBooking,
+          performerRole,
         });
         setList((all) => [...(all ?? []), created].sort((a, b) => a.name.localeCompare(b.name)));
         toast(service ? "Serviço cadastrado. Ele já aparece na agenda." : "Produto cadastrado.");
@@ -121,7 +125,7 @@ export function ProductsBoard() {
     }
   }
 
-  const set = (k: keyof typeof EMPTY, v: string) => setForm((f) => ({ ...f, [k]: v }));
+  const set = (k: Exclude<keyof typeof EMPTY, "online">, v: string) => setForm((f) => ({ ...f, [k]: v }));
 
   return (
     <div className="stack-page">
@@ -204,7 +208,19 @@ export function ProductsBoard() {
           <label className="field"><span>Preço (R$)</span><input className="input" inputMode="decimal" placeholder="0,00" required value={form.price} onChange={(e) => set("price", e.target.value)} /></label>
           <label className="field"><span>Custo (R$)</span><input className="input" inputMode="decimal" placeholder="0,00" required value={form.cost} onChange={(e) => set("cost", e.target.value)} /></label>
           {form.category === "servico" ? (
-            <label className="field"><span>Duração na agenda (min)</span><input className="input" type="number" min={10} max={720} step={5} value={form.duration} onChange={(e) => set("duration", e.target.value)} /></label>
+            <>
+              <label className="field"><span>Duração na agenda (min)</span><input className="input" type="number" min={10} max={720} step={5} value={form.duration} onChange={(e) => set("duration", e.target.value)} /></label>
+              <label className="field"><span>Quem faz</span>
+                <select className="select" value={form.performer} onChange={(e) => set("performer", e.target.value)}>
+                  <option value="">Sem profissional (ex.: diária de creche)</option>
+                  {PERFORMER_ROLES.map((r) => <option key={r} value={r}>{LABELS.role[r]}</option>)}
+                </select>
+              </label>
+              <label className="check-row full">
+                <input type="checkbox" checked={form.online} onChange={(e) => setForm((f) => ({ ...f, online: e.target.checked }))} />
+                Disponível no agendamento online
+              </label>
+            </>
           ) : (
             <>
               {!editing && <label className="field"><span>Estoque inicial</span><input className="input" type="number" min={0} step={1} value={form.stock} onChange={(e) => set("stock", e.target.value)} /></label>}

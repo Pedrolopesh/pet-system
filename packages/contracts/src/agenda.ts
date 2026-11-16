@@ -87,4 +87,6 @@ export type Appointment = {
   service: { id: string; name: string };
   employee: { id: string; name: string } | null;
   saleId: string | null;
+  /** Feito pelo tutor no agendamento online. */
+  source: 'balcao' | 'online';
 };

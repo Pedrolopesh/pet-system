@@ -11,6 +11,7 @@ const FEATURES: { icon: IconName; title: string; text: string }[] = [
   { icon: "cart", title: "Caixa rápido", text: "Busque o produto, some os atendimentos do dia, escolha o pagamento e pronto. O estoque baixa sozinho." },
   { icon: "paw", title: "Clientes e seus pets", text: "O tutor com todos os pets, raça e espécie, e o histórico de atendimentos e compras de cada um." },
   { icon: "box", title: "Estoque que avisa", text: "Ração, farmácia e acessórios com estoque mínimo. O painel mostra o que repor antes de faltar." },
+  { icon: "link", title: "Agendamento online", text: "Um link para a bio do Instagram: o tutor vê os horários livres e agenda sozinho, com login por código no e-mail." },
   { icon: "users", title: "Equipe com permissões", text: "Convide gerentes e atendentes por link. Cada um vê o que precisa, e só o dono mexe no plano." },
   { icon: "chart", title: "Relatórios de verdade", text: "Receita por dia, ticket médio, lucro bruto, serviços campeões e quem mais vendeu." },
 ];
@@ -36,6 +37,7 @@ export default function Home() {
               <Link className="btn lg ghost" href="/entrar/?criar=1">Começar 14 dias grátis</Link>
             </div>
             <p className="note"><Icon name="check" size={16} /> Sem cartão de crédito. A demo volta ao estado original todo dia.</p>
+            <Link className="note link-note" href="/agendar/?loja=patas-e-cia"><Icon name="calendar" size={16} /> Ver como o tutor agenda online →</Link>
           </div>
           <div className="media" aria-hidden="true">
             <div className="frame">

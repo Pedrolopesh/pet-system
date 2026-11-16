@@ -87,7 +87,10 @@ export function AppointmentDetail({
     <Modal open={a !== null} title={a ? `${a.pet.name} · ${a.service.name}` : ""} onClose={close}>
       {a && (
         <div className="appt-detail">
-          <div className={`status-pill st-${a.status}`}>{LABELS.status[a.status]}</div>
+          <div className="pills-row">
+            <div className={`status-pill st-${a.status}`}>{LABELS.status[a.status]}</div>
+            {a.source === "online" && <span className="badge"><Icon name="link" size={12} /> Agendado pelo tutor</span>}
+          </div>
           <dl>
             <div><dt>Quando</dt><dd>{TIME.format(new Date(a.startsAt))} até {hhmm(minuteOfDay(a.endsAt))}</dd></div>
             <div><dt>Profissional</dt><dd>{a.employee?.name ?? "Sem profissional"}</dd></div>

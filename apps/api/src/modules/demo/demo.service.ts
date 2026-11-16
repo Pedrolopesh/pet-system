@@ -47,6 +47,8 @@ export class DemoService {
         name: 'Patas & Cia',
         isDemo: true,
         businessTypes: ['petshop', 'creche', 'clinica'],
+        slug: 'patas-e-cia',
+        bookingEnabled: true,
         users: { create: { name: 'Visitante', email: DEMO_EMAIL, passwordHash } },
       },
       include: { users: { select: { id: true } } },

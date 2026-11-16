@@ -81,6 +81,11 @@ enum RecordKind {
   procedimento
 }
 
+enum AppointmentSource {
+  balcao
+  online
+}
+
 enum NotePriority {
   urgente
   importante
@@ -95,21 +100,29 @@ enum StockReason {
 }
 
 model Shop {
-  id             String         @id @default(uuid()) @db.Uuid
-  name           String         @db.VarChar(80)
+  id                 String         @id @default(uuid()) @db.Uuid
+  name               String         @db.VarChar(80)
   /// Loja de demonstração pública: restaurada todo dia, sem troca de e-mail ou senha
-  isDemo         Boolean        @default(false) @map("is_demo")
+  isDemo             Boolean        @default(false) @map("is_demo")
   /// Próximo número de venda (sequência por loja)
-  nextSaleNumber Int            @default(1) @map("next_sale_number")
+  nextSaleNumber     Int            @default(1) @map("next_sale_number")
   /// Tipos de negócio da loja (pode ser mais de um: pet shop com banho e creche, por exemplo)
-  businessTypes  BusinessType[] @default([petshop]) @map("business_types")
-  plan           Plan           @default(teste)
+  businessTypes      BusinessType[] @default([petshop]) @map("business_types")
+  plan               Plan           @default(teste)
   /// Fim do período de teste (só vale com plan = teste)
-  trialEndsAt    DateTime?      @map("trial_ends_at") @db.Timestamptz
+  trialEndsAt        DateTime?      @map("trial_ends_at") @db.Timestamptz
   /// Horário de funcionamento usado na agenda (HH:MM, fuso da loja)
-  opensAt        String         @default("08:00") @map("opens_at") @db.VarChar(5)
-  closesAt       String         @default("19:00") @map("closes_at") @db.VarChar(5)
-  createdAt      DateTime       @default(now()) @map("created_at") @db.Timestamptz
+  opensAt            String         @default("08:00") @map("opens_at") @db.VarChar(5)
+  closesAt           String         @default("19:00") @map("closes_at") @db.VarChar(5)
+  /// Endereço da página pública (/agendar?loja=slug)
+  slug               String?        @unique @db.VarChar(40)
+  bookingEnabled     Boolean        @default(false) @map("booking_enabled")
+  /// Antecedência mínima para agendar online e para cancelar (horas)
+  bookingNoticeHours Int            @default(2) @map("booking_notice_hours")
+  cancelNoticeHours  Int            @default(4) @map("cancel_notice_hours")
+  /// Até quantos dias à frente o tutor pode agendar
+  bookingWindowDays  Int            @default(30) @map("booking_window_days")
+  createdAt          DateTime       @default(now()) @map("created_at") @db.Timestamptz
 
   users        User[]
   products     Product[]
@@ -122,6 +135,7 @@ model Shop {
   invites      Invite[]
   records      MedicalRecord[]
   vaccinations Vaccination[]
+  tutorCodes   TutorLoginCode[]
 
   @@map("shops")
 }
@@ -173,6 +187,10 @@ model Product {
   minStock        Int      @default(0) @map("min_stock")
   /// Duração padrão do serviço na agenda (só para category = servico)
   durationMinutes Int?     @map("duration_minutes")
+  /// Aparece no agendamento online (só serviços)
+  onlineBooking   Boolean  @default(false) @map("online_booking")
+  /// Quem executa o serviço; null = sem profissional (ex.: diária de creche)
+  performerRole   Role?    @map("performer_role")
   active          Boolean  @default(true)
   createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz
   updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz
@@ -326,6 +344,7 @@ model Appointment {
   startsAt   DateTime          @map("starts_at") @db.Timestamptz
   endsAt     DateTime          @map("ends_at") @db.Timestamptz
   status     AppointmentStatus @default(agendado)
+  source     AppointmentSource @default(balcao)
   /// Preço combinado (centavos), copiado do serviço na criação
   price      Int
   notes      String            @default("") @db.VarChar(500)
@@ -435,4 +454,21 @@ model Vaccination {
   @@index([shopId, nextDoseAt])
   @@index([petId, appliedAt])
   @@map("vaccinations")
+}
+
+/// Código de 6 dígitos para o tutor entrar no portal. Só o hash fica salvo; vale 10 minutos e 5 tentativas.
+model TutorLoginCode {
+  id        String    @id @default(uuid()) @db.Uuid
+  shopId    String    @map("shop_id") @db.Uuid
+  email     String    @db.VarChar(254)
+  codeHash  String    @map("code_hash") @db.VarChar(64)
+  expiresAt DateTime  @map("expires_at") @db.Timestamptz
+  attempts  Int       @default(0)
+  usedAt    DateTime? @map("used_at") @db.Timestamptz
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
+
+  shop Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@index([shopId, email, createdAt])
+  @@map("tutor_login_codes")
 }

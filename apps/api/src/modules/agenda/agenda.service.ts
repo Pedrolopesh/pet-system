@@ -27,6 +27,7 @@ export const APPOINTMENT_SELECT = {
   price: true,
   notes: true,
   saleId: true,
+  source: true,
   client: { select: { id: true, name: true, phone: true } },
   pet: { select: { id: true, name: true, species: true, breed: true } },
   service: { select: { id: true, name: true } },
