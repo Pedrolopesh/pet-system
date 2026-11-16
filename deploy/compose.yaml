@@ -1,0 +1,61 @@
+# Produção do Pet System na VPS: projeto, rede, volume e containers prefixados com "pet-system".
+#
+# postgres → rede interna (sem saída para a internet, sem porta publicada).
+# api      → única porta publicada, presa a API_BIND (172.17.0.1 na VPS): só o proxy reverso
+#            (nginx, que termina o TLS de petsystem-api.pedrolopes.tech) chega nela.
+# Build da imagem a partir da raiz do monorepo: docker build -f apps/api/Dockerfile -t pet-system-api:prod .
+name: pet-system
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: pet-system-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: petsystem
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD}
+      POSTGRES_DB: petsystem
+    volumes:
+      - pet-system-pg-data:/var/lib/postgresql/data
+    networks: [db]
+    mem_limit: 512m
+    security_opt: ['no-new-privileges:true']
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U petsystem -d petsystem']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  api:
+    image: ${API_IMAGE:-pet-system-api:prod}
+    container_name: pet-system-api
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 3340
+      DATABASE_URL: postgresql://petsystem:${POSTGRES_PASSWORD}@postgres:5432/petsystem
+    ports:
+      - '${API_BIND:-127.0.0.1}:${API_PORT:-3006}:3340'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [db, edge]
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ['no-new-privileges:true']
+    mem_limit: 384m
+    pids_limit: 128
+
+networks:
+  db:
+    name: pet-system-db
+    internal: true
+  edge:
+    name: pet-system-edge
+
+volumes:
+  pet-system-pg-data:
+    name: pet-system-pg-data
