@@ -1,6 +1,4 @@
 # Links da versão antiga (HTML estático) caem na página certa da nova.
 /Pet-System-website/*   /   301
 /pet-system-website/*   /   301
-/pet-system/*           /entrar   301
-# SPA: qualquer outra rota é resolvida pelo Vue Router.
-/*   /index.html   200
+/pet-system/*           /entrar/   301

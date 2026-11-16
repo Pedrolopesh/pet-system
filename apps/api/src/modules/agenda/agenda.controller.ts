@@ -36,6 +36,14 @@ export class AgendaController {
     return this.agenda.list(p.shopId, q.from, q.days, q.employeeId);
   }
 
+  @Get(':id')
+  get(
+    @CurrentPrincipal() p: Principal,
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<Appointment> {
+    return this.agenda.get(p.shopId, id);
+  }
+
   @Post()
   create(
     @CurrentPrincipal() p: Principal,

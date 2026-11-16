@@ -1,31 +1,42 @@
 # Pet System
 
-Gestão de pet shop: caixa, estoque, clientes e seus pets, equipe e relatórios.
+SaaS de gestão para **pet shops, creches e clínicas veterinárias**: agenda sem conflito de horário, caixa, estoque, clientes e seus pets, equipe com permissões e relatórios.
 
-**Teste sem cadastro:** a página inicial tem um botão que abre uma loja de demonstração com 60 dias de vendas. Ela volta ao estado original todo dia às 4h.
+**Teste sem cadastro:** a página inicial tem um botão que abre uma loja de demonstração (pet shop + creche + clínica) com agenda e 60 dias de vendas. Ela volta ao estado original todo dia às 4h.
+
+## O que tem
+
+- **Agenda** por profissional (dia e semana): banho, tosa, consulta, vacina e diária de creche, com duração do serviço. Dois atendimentos do mesmo profissional no mesmo horário não passam, nem com pedidos simultâneos. Fluxo de status: agendado → confirmado → em atendimento → pronto para buscar → concluído (ou cancelado/faltou).
+- **Caixa** que cobra os atendimentos do dia junto com produtos; o atendimento fica concluído e ligado à venda.
+- **Clientes e pets**, **produtos e estoque** com alerta de mínimo, **relatórios** com exportação CSV.
+- **SaaS:** cada conta é uma loja isolada; teste grátis de 14 dias; planos Básico e Pro com limites (usuários, profissionais, relatórios); papéis dono, gerente e atendente; convite por link de uso único.
+- **Páginas de venda** por segmento (`/pet-shop`, `/creche`, `/clinica`) e de preços, geradas estaticamente.
+- **Primeiros passos** no painel para lojas novas e avisos da equipe com prioridade (inspirados no tutorial e no painel da versão antiga).
+
+A cobrança das assinaturas ainda não está ligada: escolher um plano libera os limites sem pagamento.
 
 ## Antes e depois
 
-O Pet System foi meu primeiro projeto (2022): HTML, CSS e JavaScript puros, com os dados salvos no navegador. A versão 2 refaz o produto como um sistema completo:
+O Pet System foi meu primeiro projeto (2022): HTML, CSS e JavaScript puros, com os dados salvos no navegador.
 
 | | v1 (2022) | v2 |
 | --- | --- | --- |
+| Produto | ERP de uma loja só | SaaS para pet shops, creches e clínicas |
 | Arquitetura | páginas HTML soltas | monorepo pnpm + Turborepo: `apps/web`, `apps/api`, `packages/contracts` |
-| Front | HTML, CSS e JavaScript puros + Bootstrap | Vue 3, TypeScript, Pinia, Vite |
+| Front | HTML, CSS e JavaScript puros + Bootstrap | Next.js 16 (React 19), exportado como site estático |
 | Dados | `localStorage` (senha em texto puro) | API NestJS + Prisma + Postgres |
 | Login | comparação de senha no navegador | argon2id, JWT de 15 min e refresh rotativo com detecção de reuso |
-| Multiloja | não | cada conta tem a própria loja; nada vaza entre lojas (testado) |
+| Agenda | não existia | por profissional, sem conflito, com fluxo de status |
 | Estoque | podia ficar negativo | baixa atômica com UPDATE condicional, mesmo com vendas simultâneas |
-| Relatórios | gráfico do Highcharts (licença comercial) | gráficos próprios em SVG/CSS, export CSV seguro contra injeção de fórmula |
-| Testes | nenhum | Vitest (unitários) + e2e da API em Postgres real + testes de componentes |
+| Testes | nenhum | unitários + 34 e2e da API em Postgres real + testes do web |
 | Mídia | vídeo de 17,8 MB | 922 KB |
 
 ## Estrutura
 
 ```
 apps/
-  api/        NestJS 12 + Prisma 7 + Postgres (auth, produtos, clientes, vendas, relatórios, demo)
-  web/        Vue 3 + Vite (landing, login, painel, caixa, produtos, clientes, equipe, relatórios)
+  api/        NestJS 12 + Prisma 7 + Postgres (auth, contas e planos, agenda, produtos, clientes, vendas, relatórios, demo)
+  web/        Next.js 16 (páginas de venda, login, painel, agenda, caixa, clientes, produtos, equipe, relatórios, configurações)
 packages/
   contracts/  schemas Zod e tipos compartilhados entre API e web
   eslint-config/, tsconfig/
@@ -55,7 +66,8 @@ pnpm verify    # lint + tipos + testes + build + e2e da API + varredura de segur
 
 ## Segurança
 
-- Toda rota da API nasce protegida (guard global); a loja vem do banco, nunca do corpo da requisição.
+- Toda rota da API nasce protegida (guard global); a loja e o papel vêm do banco, nunca do corpo da requisição.
+- Permissões por papel no servidor (o front só esconde botões); convites guardados só como hash e de uso único.
 - Senhas com argon2id (parâmetros da OWASP); login com tempo constante para não revelar e-mails cadastrados.
 - Refresh token opaco, salvo só como hash, rotativo; reusar um token antigo encerra a sessão inteira.
 - Rate limit por IP (geral e mais rígido no login), helmet, CORS por lista, logs sem corpo de requisição e com dados sensíveis mascarados.
@@ -63,7 +75,7 @@ pnpm verify    # lint + tipos + testes + build + e2e da API + varredura de segur
 
 ## Deploy
 
-- **Web:** Netlify (`netlify.toml`), publica `apps/web/dist`. Links da versão antiga redirecionam para a nova.
+- **Web:** Netlify (`netlify.toml`), publica `apps/web/out`. Links da versão antiga redirecionam para a nova.
 - **API:** container (`apps/api/Dockerfile`, build a partir da raiz) atrás de proxy reverso com HTTPS.
 
 Feito por [Pedro Lopes](https://www.pedrolopes.tech).

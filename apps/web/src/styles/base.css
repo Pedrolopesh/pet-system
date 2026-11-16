@@ -19,8 +19,8 @@
   --ink: #241b2b;
   --muted: #6c6274;
   --soft: #958b9c;
-  --display: "Fredoka", "Nunito Sans", system-ui, sans-serif;
-  --font: "Nunito Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --display: var(--font-display), system-ui, sans-serif;
+  --font: var(--font-body), system-ui, -apple-system, "Segoe UI", sans-serif;
   --radius: 20px;
   --radius-sm: 12px;
   --shadow-sm: 0 1px 2px rgba(60, 20, 80, 0.06), 0 2px 8px rgba(60, 20, 80, 0.04);

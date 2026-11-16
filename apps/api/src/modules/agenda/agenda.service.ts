@@ -71,6 +71,15 @@ export class AgendaService {
     return rows.map(toAppointment);
   }
 
+  async get(shopId: string, id: string): Promise<Appointment> {
+    const row = await this.prisma.appointment.findFirst({
+      where: { id, shopId },
+      select: APPOINTMENT_SELECT,
+    });
+    if (!row) throw notFound('Atendimento');
+    return toAppointment(row);
+  }
+
   async create(
     shopId: string,
     input: z.infer<typeof appointmentInputSchema>,
