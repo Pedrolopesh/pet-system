@@ -1,0 +1,27 @@
+{
+  "name": "pet-system",
+  "version": "2.0.0",
+  "private": true,
+  "license": "MIT",
+  "description": "Pet System: gestão de pet shop (monorepo pnpm + Turborepo)",
+  "packageManager": "pnpm@11.28.3",
+  "engines": {
+    "node": ">=24"
+  },
+  "type": "module",
+  "scripts": {
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "typecheck": "turbo typecheck",
+    "test": "turbo test",
+    "dev": "turbo dev",
+    "format": "prettier --write .",
+    "db:up": "docker compose up -d --wait",
+    "security": "bash scripts/security-scan.sh",
+    "verify": "turbo run lint typecheck test build && pnpm --filter @petsystem/api test:e2e && bash scripts/security-scan.sh"
+  },
+  "devDependencies": {
+    "prettier": "^3.9.10",
+    "turbo": "^2.11.11"
+  }
+}

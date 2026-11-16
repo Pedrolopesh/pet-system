@@ -1,0 +1,7 @@
+# Netlify publica só o app web; a API roda na VPS (veja apps/api/Dockerfile).
+[build]
+  command = "corepack enable && pnpm install --frozen-lockfile && pnpm exec turbo run build --filter=@petsystem/web"
+  publish = "apps/web/dist"
+
+[build.environment]
+  NODE_VERSION = "24"

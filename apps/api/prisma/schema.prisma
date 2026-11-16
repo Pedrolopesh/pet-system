@@ -1,0 +1,233 @@
+// Fonte da verdade do banco. Datas em UTC (timestamptz). Dinheiro sempre em centavos (Int).
+// Todo dado de negócio pertence a uma loja (shop_id): uma conta nunca enxerga outra loja.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Category {
+  racao
+  petisco
+  higiene
+  acessorio
+  farmacia
+  servico
+}
+
+enum Payment {
+  pix
+  credito
+  debito
+  dinheiro
+}
+
+enum Species {
+  cao
+  gato
+  outro
+}
+
+enum Role {
+  gerente
+  atendente
+  banho
+}
+
+enum StockReason {
+  entrada
+  perda
+  correcao
+  venda
+}
+
+model Shop {
+  id             String   @id @default(uuid()) @db.Uuid
+  name           String   @db.VarChar(80)
+  /// Loja de demonstração pública: restaurada todo dia, sem troca de e-mail ou senha
+  isDemo         Boolean  @default(false) @map("is_demo")
+  /// Próximo número de venda (sequência por loja)
+  nextSaleNumber Int      @default(1) @map("next_sale_number")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  users     User[]
+  products  Product[]
+  clients   Client[]
+  employees Employee[]
+  sales     Sale[]
+  notes     Note[]
+  movements StockMovement[]
+
+  @@map("shops")
+}
+
+model User {
+  id           String    @id @default(uuid()) @db.Uuid
+  shopId       String    @map("shop_id") @db.Uuid
+  name         String    @db.VarChar(80)
+  email        String    @unique @db.VarChar(254)
+  /// argon2id
+  passwordHash String    @map("password_hash")
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  lastLoginAt  DateTime? @map("last_login_at") @db.Timestamptz
+
+  shop          Shop           @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  refreshTokens RefreshToken[]
+
+  @@map("users")
+}
+
+/// Refresh token rotativo: só o hash fica salvo. Reusar um token já trocado derruba a família inteira.
+model RefreshToken {
+  id        String    @id @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  familyId  String    @map("family_id") @db.Uuid
+  tokenHash String    @map("token_hash") @db.VarChar(64)
+  expiresAt DateTime  @map("expires_at") @db.Timestamptz
+  revokedAt DateTime? @map("revoked_at") @db.Timestamptz
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([familyId])
+  @@index([expiresAt])
+  @@map("refresh_tokens")
+}
+
+model Product {
+  id        String   @id @default(uuid()) @db.Uuid
+  shopId    String   @map("shop_id") @db.Uuid
+  name      String   @db.VarChar(80)
+  category  Category
+  price     Int
+  cost      Int
+  /// null = serviço, sem controle de estoque
+  stock     Int?
+  minStock  Int      @default(0) @map("min_stock")
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  shop      Shop            @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  movements StockMovement[]
+
+  @@index([shopId, active])
+  @@map("products")
+}
+
+/// Histórico de toda mudança de estoque (vendas, entradas, perdas e correções).
+model StockMovement {
+  id        String      @id @default(uuid()) @db.Uuid
+  shopId    String      @map("shop_id") @db.Uuid
+  productId String      @map("product_id") @db.Uuid
+  delta     Int
+  reason    StockReason
+  saleId    String?     @map("sale_id") @db.Uuid
+  createdAt DateTime    @default(now()) @map("created_at") @db.Timestamptz
+
+  shop    Shop    @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId, createdAt])
+  @@map("stock_movements")
+}
+
+model Client {
+  id        String   @id @default(uuid()) @db.Uuid
+  shopId    String   @map("shop_id") @db.Uuid
+  name      String   @db.VarChar(80)
+  phone     String   @default("") @db.VarChar(11)
+  email     String   @default("") @db.VarChar(254)
+  notes     String   @default("") @db.VarChar(500)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  shop  Shop   @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  pets  Pet[]
+  sales Sale[]
+
+  @@index([shopId, name])
+  @@map("clients")
+}
+
+model Pet {
+  id       String  @id @default(uuid()) @db.Uuid
+  clientId String  @map("client_id") @db.Uuid
+  name     String  @db.VarChar(40)
+  species  Species
+  breed    String  @default("") @db.VarChar(40)
+
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@map("pets")
+}
+
+model Employee {
+  id     String  @id @default(uuid()) @db.Uuid
+  shopId String  @map("shop_id") @db.Uuid
+  name   String  @db.VarChar(80)
+  role   Role
+  active Boolean @default(true)
+
+  shop  Shop   @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  sales Sale[]
+
+  @@map("employees")
+}
+
+model Sale {
+  id         String   @id @default(uuid()) @db.Uuid
+  shopId     String   @map("shop_id") @db.Uuid
+  number     Int
+  at         DateTime @default(now()) @db.Timestamptz
+  clientId   String?  @map("client_id") @db.Uuid
+  employeeId String   @map("employee_id") @db.Uuid
+  payment    Payment
+  subtotal   Int
+  discount   Int      @default(0)
+  total      Int
+  /// Custo dos itens no momento da venda (para o lucro bruto)
+  cost       Int
+
+  shop     Shop       @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  client   Client?    @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  employee Employee   @relation(fields: [employeeId], references: [id], onDelete: Restrict)
+  items    SaleItem[]
+
+  @@unique([shopId, number])
+  @@index([shopId, at])
+  @@map("sales")
+}
+
+model SaleItem {
+  id        String @id @default(uuid()) @db.Uuid
+  saleId    String @map("sale_id") @db.Uuid
+  /// Sem FK: o histórico da venda continua mesmo se o produto mudar de nome
+  productId String @map("product_id") @db.Uuid
+  name      String @db.VarChar(80)
+  category  Category
+  qty       Int
+  unitPrice Int    @map("unit_price")
+  unitCost  Int    @map("unit_cost")
+
+  sale Sale @relation(fields: [saleId], references: [id], onDelete: Cascade)
+
+  @@index([saleId])
+  @@map("sale_items")
+}
+
+model Note {
+  id        String   @id @default(uuid()) @db.Uuid
+  shopId    String   @map("shop_id") @db.Uuid
+  text      String   @db.VarChar(200)
+  done      Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  shop Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@index([shopId])
+  @@map("notes")
+}

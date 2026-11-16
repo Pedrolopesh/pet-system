@@ -1,0 +1,24 @@
+{
+  "extends": "@petsystem/tsconfig/node.json",
+  "compilerOptions": {
+    "resolvePackageJsonExports": true,
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "strictPropertyInitialization": false,
+    "sourceMap": true,
+    "outDir": "./dist",
+    "rootDir": ".",
+    "types": ["node"]
+  },
+  "include": [
+    "src",
+    "test",
+    "prisma",
+    "prisma.config.ts",
+    "vitest.config.ts",
+    "vitest.config.e2e.ts",
+    "eslint.config.js"
+  ]
+}
