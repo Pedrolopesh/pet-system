@@ -1,1 +1,29 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="18" fill="#ba2bd2"/><g fill="#fff"><ellipse cx="32" cy="40" rx="11" ry="9.5"/><ellipse cx="18.5" cy="28" rx="4.6" ry="6"/><ellipse cx="45.5" cy="28" rx="4.6" ry="6"/><ellipse cx="25.5" cy="18.5" rx="4.4" ry="5.8"/><ellipse cx="38.5" cy="18.5" rx="4.4" ry="5.8"/></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#B026D9"/>
+      <stop offset="100%" stop-color="#8B1FA8"/>
+    </linearGradient>
+  </defs>
+  <!-- Background circle -->
+  <circle cx="256" cy="256" r="240" fill="url(#bg)"/>
+  <!-- Stylized pet silhouette - modern/minimal -->
+  <path d="M180 340 C180 340 160 280 170 240 C175 220 190 200 210 195 C215 180 225 160 240 155 C250 152 260 155 265 160 C275 150 290 148 300 155 C315 165 320 185 318 200 C335 210 345 230 342 255 C340 280 330 310 325 330 C322 340 315 348 305 350 L200 350 C190 348 183 345 180 340 Z" fill="white" opacity="0.95"/>
+  <!-- Ear left -->
+  <ellipse cx="195" cy="195" rx="25" ry="40" transform="rotate(-20 195 195)" fill="white" opacity="0.9"/>
+  <!-- Ear right -->
+  <ellipse cx="310" cy="190" rx="25" ry="40" transform="rotate(15 310 190)" fill="white" opacity="0.9"/>
+  <!-- Eye left -->
+  <circle cx="225" cy="250" r="12" fill="#B026D9"/>
+  <circle cx="228" cy="247" r="4" fill="white"/>
+  <!-- Eye right -->
+  <circle cx="285" cy="248" r="12" fill="#B026D9"/>
+  <circle cx="288" cy="245" r="4" fill="white"/>
+  <!-- Nose -->
+  <ellipse cx="255" cy="285" rx="14" ry="10" fill="#B026D9"/>
+  <!-- Mouth -->
+  <path d="M245 298 Q255 308 265 298" stroke="#B026D9" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <!-- Plus/cross symbol for health/tech -->
+  <rect x="355" y="140" width="50" height="14" rx="7" fill="white" opacity="0.8"/>
+  <rect x="373" y="122" width="14" height="50" rx="7" fill="white" opacity="0.8"/>
+</svg>
