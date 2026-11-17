@@ -1,0 +1,25 @@
+# Postgres local para desenvolvimento e testes. NÃO é a infraestrutura de produção.
+# A porta só é publicada em 127.0.0.1 (o Docker ignora o firewall do sistema em portas publicadas).
+name: pet-system-dev
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: petsystem
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD no .env da raiz (veja .env.example)}
+      POSTGRES_DB: petsystem
+    ports:
+      - '127.0.0.1:${POSTGRES_PORT:-5545}:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker/initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U petsystem -d petsystem']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  pgdata:

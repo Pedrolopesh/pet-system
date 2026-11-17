@@ -1,0 +1,474 @@
+// Fonte da verdade do banco. Datas em UTC (timestamptz). Dinheiro sempre em centavos (Int).
+// Todo dado de negócio pertence a uma loja (shop_id): uma conta nunca enxerga outra loja.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Category {
+  racao
+  petisco
+  higiene
+  acessorio
+  farmacia
+  servico
+}
+
+enum Payment {
+  pix
+  credito
+  debito
+  dinheiro
+}
+
+enum Species {
+  cao
+  gato
+  outro
+}
+
+enum Role {
+  gerente
+  atendente
+  banho
+  veterinario
+  cuidador
+}
+
+enum BusinessType {
+  petshop
+  creche
+  clinica
+}
+
+enum Plan {
+  teste
+  basico
+  pro
+}
+
+enum UserRole {
+  dono
+  gerente
+  atendente
+}
+
+enum AppointmentStatus {
+  agendado
+  confirmado
+  em_atendimento
+  pronto
+  concluido
+  cancelado
+  faltou
+}
+
+enum PetSex {
+  macho
+  femea
+}
+
+enum RecordKind {
+  consulta
+  retorno
+  vacinacao
+  emergencia
+  procedimento
+}
+
+enum AppointmentSource {
+  balcao
+  online
+}
+
+enum NotePriority {
+  urgente
+  importante
+  normal
+}
+
+enum StockReason {
+  entrada
+  perda
+  correcao
+  venda
+}
+
+model Shop {
+  id                 String         @id @default(uuid()) @db.Uuid
+  name               String         @db.VarChar(80)
+  /// Loja de demonstração pública: restaurada todo dia, sem troca de e-mail ou senha
+  isDemo             Boolean        @default(false) @map("is_demo")
+  /// Próximo número de venda (sequência por loja)
+  nextSaleNumber     Int            @default(1) @map("next_sale_number")
+  /// Tipos de negócio da loja (pode ser mais de um: pet shop com banho e creche, por exemplo)
+  businessTypes      BusinessType[] @default([petshop]) @map("business_types")
+  plan               Plan           @default(teste)
+  /// Fim do período de teste (só vale com plan = teste)
+  trialEndsAt        DateTime?      @map("trial_ends_at") @db.Timestamptz
+  /// Horário de funcionamento usado na agenda (HH:MM, fuso da loja)
+  opensAt            String         @default("08:00") @map("opens_at") @db.VarChar(5)
+  closesAt           String         @default("19:00") @map("closes_at") @db.VarChar(5)
+  /// Endereço da página pública (/agendar?loja=slug)
+  slug               String?        @unique @db.VarChar(40)
+  bookingEnabled     Boolean        @default(false) @map("booking_enabled")
+  /// Antecedência mínima para agendar online e para cancelar (horas)
+  bookingNoticeHours Int            @default(2) @map("booking_notice_hours")
+  cancelNoticeHours  Int            @default(4) @map("cancel_notice_hours")
+  /// Até quantos dias à frente o tutor pode agendar
+  bookingWindowDays  Int            @default(30) @map("booking_window_days")
+  createdAt          DateTime       @default(now()) @map("created_at") @db.Timestamptz
+
+  users        User[]
+  products     Product[]
+  clients      Client[]
+  employees    Employee[]
+  sales        Sale[]
+  notes        Note[]
+  movements    StockMovement[]
+  appointments Appointment[]
+  invites      Invite[]
+  records      MedicalRecord[]
+  vaccinations Vaccination[]
+  tutorCodes   TutorLoginCode[]
+
+  @@map("shops")
+}
+
+model User {
+  id           String    @id @default(uuid()) @db.Uuid
+  shopId       String    @map("shop_id") @db.Uuid
+  name         String    @db.VarChar(80)
+  email        String    @unique @db.VarChar(254)
+  /// argon2id
+  passwordHash String    @map("password_hash")
+  role         UserRole  @default(dono)
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  lastLoginAt  DateTime? @map("last_login_at") @db.Timestamptz
+
+  shop          Shop            @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  refreshTokens RefreshToken[]
+  records       MedicalRecord[]
+
+  @@map("users")
+}
+
+/// Refresh token rotativo: só o hash fica salvo. Reusar um token já trocado derruba a família inteira.
+model RefreshToken {
+  id        String    @id @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  familyId  String    @map("family_id") @db.Uuid
+  tokenHash String    @map("token_hash") @db.VarChar(64)
+  expiresAt DateTime  @map("expires_at") @db.Timestamptz
+  revokedAt DateTime? @map("revoked_at") @db.Timestamptz
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([familyId])
+  @@index([expiresAt])
+  @@map("refresh_tokens")
+}
+
+model Product {
+  id              String   @id @default(uuid()) @db.Uuid
+  shopId          String   @map("shop_id") @db.Uuid
+  name            String   @db.VarChar(80)
+  category        Category
+  price           Int
+  cost            Int
+  /// null = serviço, sem controle de estoque
+  stock           Int?
+  minStock        Int      @default(0) @map("min_stock")
+  /// Duração padrão do serviço na agenda (só para category = servico)
+  durationMinutes Int?     @map("duration_minutes")
+  /// Aparece no agendamento online (só serviços)
+  onlineBooking   Boolean  @default(false) @map("online_booking")
+  /// Quem executa o serviço; null = sem profissional (ex.: diária de creche)
+  performerRole   Role?    @map("performer_role")
+  active          Boolean  @default(true)
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  shop         Shop            @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  movements    StockMovement[]
+  appointments Appointment[]
+
+  @@index([shopId, active])
+  @@map("products")
+}
+
+/// Histórico de toda mudança de estoque (vendas, entradas, perdas e correções).
+model StockMovement {
+  id        String      @id @default(uuid()) @db.Uuid
+  shopId    String      @map("shop_id") @db.Uuid
+  productId String      @map("product_id") @db.Uuid
+  delta     Int
+  reason    StockReason
+  saleId    String?     @map("sale_id") @db.Uuid
+  createdAt DateTime    @default(now()) @map("created_at") @db.Timestamptz
+
+  shop    Shop    @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId, createdAt])
+  @@map("stock_movements")
+}
+
+model Client {
+  id        String   @id @default(uuid()) @db.Uuid
+  shopId    String   @map("shop_id") @db.Uuid
+  name      String   @db.VarChar(80)
+  phone     String   @default("") @db.VarChar(11)
+  email     String   @default("") @db.VarChar(254)
+  notes     String   @default("") @db.VarChar(500)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  shop         Shop          @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  pets         Pet[]
+  sales        Sale[]
+  appointments Appointment[]
+
+  @@index([shopId, name])
+  @@map("clients")
+}
+
+model Pet {
+  id        String    @id @default(uuid()) @db.Uuid
+  clientId  String    @map("client_id") @db.Uuid
+  name      String    @db.VarChar(40)
+  species   Species
+  breed     String    @default("") @db.VarChar(40)
+  /// Ficha de saúde (opcional, preenchida pela clínica)
+  birthDate DateTime? @map("birth_date") @db.Date
+  sex       PetSex?
+  neutered  Boolean?
+  /// Alergias e alertas clínicos, mostrados em destaque no prontuário
+  allergies String    @default("") @db.VarChar(300)
+
+  client       Client          @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  appointments Appointment[]
+  records      MedicalRecord[]
+  vaccinations Vaccination[]
+
+  @@map("pets")
+}
+
+model Employee {
+  id     String  @id @default(uuid()) @db.Uuid
+  shopId String  @map("shop_id") @db.Uuid
+  name   String  @db.VarChar(80)
+  role   Role
+  active Boolean @default(true)
+
+  shop         Shop            @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  sales        Sale[]
+  appointments Appointment[]
+  records      MedicalRecord[]
+  vaccinations Vaccination[]
+
+  @@map("employees")
+}
+
+model Sale {
+  id         String   @id @default(uuid()) @db.Uuid
+  shopId     String   @map("shop_id") @db.Uuid
+  number     Int
+  at         DateTime @default(now()) @db.Timestamptz
+  clientId   String?  @map("client_id") @db.Uuid
+  employeeId String   @map("employee_id") @db.Uuid
+  payment    Payment
+  subtotal   Int
+  discount   Int      @default(0)
+  total      Int
+  /// Custo dos itens no momento da venda (para o lucro bruto)
+  cost       Int
+
+  shop         Shop          @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  client       Client?       @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  employee     Employee      @relation(fields: [employeeId], references: [id], onDelete: Restrict)
+  items        SaleItem[]
+  appointments Appointment[]
+
+  @@unique([shopId, number])
+  @@index([shopId, at])
+  @@map("sales")
+}
+
+model SaleItem {
+  id        String   @id @default(uuid()) @db.Uuid
+  saleId    String   @map("sale_id") @db.Uuid
+  /// Sem FK: o histórico da venda continua mesmo se o produto mudar de nome
+  productId String   @map("product_id") @db.Uuid
+  name      String   @db.VarChar(80)
+  category  Category
+  qty       Int
+  unitPrice Int      @map("unit_price")
+  unitCost  Int      @map("unit_cost")
+
+  sale Sale @relation(fields: [saleId], references: [id], onDelete: Cascade)
+
+  @@index([saleId])
+  @@map("sale_items")
+}
+
+model Note {
+  id        String       @id @default(uuid()) @db.Uuid
+  shopId    String       @map("shop_id") @db.Uuid
+  text      String       @db.VarChar(200)
+  done      Boolean      @default(false)
+  priority  NotePriority @default(normal)
+  createdAt DateTime     @default(now()) @map("created_at") @db.Timestamptz
+
+  shop Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@index([shopId])
+  @@map("notes")
+}
+
+/// Atendimento agendado (banho, tosa, consulta, vacina, diária de creche...).
+model Appointment {
+  id         String            @id @default(uuid()) @db.Uuid
+  shopId     String            @map("shop_id") @db.Uuid
+  clientId   String            @map("client_id") @db.Uuid
+  petId      String            @map("pet_id") @db.Uuid
+  /// Serviço (produto da categoria "servico"); define preço e duração padrão
+  serviceId  String            @map("service_id") @db.Uuid
+  /// Profissional; sem profissional, o horário não bloqueia ninguém
+  employeeId String?           @map("employee_id") @db.Uuid
+  startsAt   DateTime          @map("starts_at") @db.Timestamptz
+  endsAt     DateTime          @map("ends_at") @db.Timestamptz
+  status     AppointmentStatus @default(agendado)
+  source     AppointmentSource @default(balcao)
+  /// Preço combinado (centavos), copiado do serviço na criação
+  price      Int
+  notes      String            @default("") @db.VarChar(500)
+  /// Venda que cobrou este atendimento
+  saleId     String?           @map("sale_id") @db.Uuid
+  createdAt  DateTime          @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt  DateTime          @updatedAt @map("updated_at") @db.Timestamptz
+
+  records MedicalRecord[]
+
+  shop     Shop      @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  client   Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  pet      Pet       @relation(fields: [petId], references: [id], onDelete: Cascade)
+  service  Product   @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+  employee Employee? @relation(fields: [employeeId], references: [id], onDelete: SetNull)
+  sale     Sale?     @relation(fields: [saleId], references: [id], onDelete: SetNull)
+
+  @@index([shopId, startsAt])
+  @@index([employeeId, startsAt])
+  @@map("appointments")
+}
+
+/// Convite para entrar na equipe da loja. Só o hash do token fica salvo; vale uma vez.
+model Invite {
+  id        String    @id @default(uuid()) @db.Uuid
+  shopId    String    @map("shop_id") @db.Uuid
+  role      UserRole
+  tokenHash String    @unique @map("token_hash") @db.VarChar(64)
+  expiresAt DateTime  @map("expires_at") @db.Timestamptz
+  usedAt    DateTime? @map("used_at") @db.Timestamptz
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
+
+  shop Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@index([shopId])
+  @@map("invites")
+}
+
+/// Registro do prontuário. Não é apagado; pode ser editado só nas primeiras 24 horas.
+model MedicalRecord {
+  id              String     @id @default(uuid()) @db.Uuid
+  shopId          String     @map("shop_id") @db.Uuid
+  petId           String     @map("pet_id") @db.Uuid
+  /// Veterinário(a) responsável (profissional da equipe)
+  vetId           String?    @map("vet_id") @db.Uuid
+  /// Quem registrou no sistema
+  authorId        String?    @map("author_id") @db.Uuid
+  appointmentId   String?    @map("appointment_id") @db.Uuid
+  kind            RecordKind @default(consulta)
+  at              DateTime   @db.Timestamptz
+  /// Peso em gramas e temperatura em décimos de grau (inteiros, sem arredondamento de float)
+  weightGrams     Int?       @map("weight_grams")
+  temperatureDeci Int?       @map("temperature_deci")
+  complaint       String     @default("") @db.VarChar(2000)
+  exam            String     @default("") @db.VarChar(4000)
+  diagnosis       String     @default("") @db.VarChar(2000)
+  treatment       String     @default("") @db.VarChar(4000)
+  createdAt       DateTime   @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime   @updatedAt @map("updated_at") @db.Timestamptz
+
+  shop         Shop               @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  pet          Pet                @relation(fields: [petId], references: [id], onDelete: Cascade)
+  vet          Employee?          @relation(fields: [vetId], references: [id], onDelete: SetNull)
+  author       User?              @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  appointment  Appointment?       @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
+  prescription PrescriptionItem[]
+  vaccinations Vaccination[]
+
+  @@index([petId, at])
+  @@map("medical_records")
+}
+
+model PrescriptionItem {
+  id           String @id @default(uuid()) @db.Uuid
+  recordId     String @map("record_id") @db.Uuid
+  position     Int
+  medication   String @db.VarChar(120)
+  dosage       String @default("") @db.VarChar(120)
+  frequency    String @default("") @db.VarChar(120)
+  duration     String @default("") @db.VarChar(120)
+  instructions String @default("") @db.VarChar(500)
+
+  record MedicalRecord @relation(fields: [recordId], references: [id], onDelete: Cascade)
+
+  @@index([recordId])
+  @@map("prescription_items")
+}
+
+/// Vacina aplicada, com a data do próximo reforço para o lembrete.
+model Vaccination {
+  id         String    @id @default(uuid()) @db.Uuid
+  shopId     String    @map("shop_id") @db.Uuid
+  petId      String    @map("pet_id") @db.Uuid
+  recordId   String?   @map("record_id") @db.Uuid
+  vetId      String?   @map("vet_id") @db.Uuid
+  vaccine    String    @db.VarChar(80)
+  appliedAt  DateTime  @map("applied_at") @db.Date
+  nextDoseAt DateTime? @map("next_dose_at") @db.Date
+  batch      String    @default("") @db.VarChar(40)
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz
+
+  shop   Shop           @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  pet    Pet            @relation(fields: [petId], references: [id], onDelete: Cascade)
+  record MedicalRecord? @relation(fields: [recordId], references: [id], onDelete: SetNull)
+  vet    Employee?      @relation(fields: [vetId], references: [id], onDelete: SetNull)
+
+  @@index([shopId, nextDoseAt])
+  @@index([petId, appliedAt])
+  @@map("vaccinations")
+}
+
+/// Código de 6 dígitos para o tutor entrar no portal. Só o hash fica salvo; vale 10 minutos e 5 tentativas.
+model TutorLoginCode {
+  id        String    @id @default(uuid()) @db.Uuid
+  shopId    String    @map("shop_id") @db.Uuid
+  email     String    @db.VarChar(254)
+  codeHash  String    @map("code_hash") @db.VarChar(64)
+  expiresAt DateTime  @map("expires_at") @db.Timestamptz
+  attempts  Int       @default(0)
+  usedAt    DateTime? @map("used_at") @db.Timestamptz
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
+
+  shop Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@index([shopId, email, createdAt])
+  @@map("tutor_login_codes")
+}

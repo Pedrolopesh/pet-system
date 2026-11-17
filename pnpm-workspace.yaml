@@ -1,0 +1,12 @@
+packages:
+  - 'apps/*'
+  - 'packages/*'
+allowBuilds:
+  # Install scripts skipped on purpose: the binaries come from the per-platform optional packages.
+  esbuild: false
+  unrs-resolver: false
+  argon2: false
+  '@swc/core': false
+  # They must run: they download the Prisma engines
+  prisma: true
+  '@prisma/engines': true

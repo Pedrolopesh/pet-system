@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: lint, tipos, testes, e2e e build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DATABASE_URL: postgresql://ci:ci-senha-descartavel@127.0.0.1:5432/petsystem_test # scan-allow: credencial efêmera do CI
+      TEST_DATABASE_URL: postgresql://ci:ci-senha-descartavel@127.0.0.1:5432/petsystem_test # scan-allow: credencial efêmera do CI
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # Postgres do próprio runner, só para os testes e2e (descartado no fim do job).
+      - name: Banco de teste
+        run: |
+          sudo systemctl start postgresql.service
+          sudo -u postgres psql -v ON_ERROR_STOP=1 -c "CREATE ROLE ci WITH LOGIN SUPERUSER PASSWORD 'ci-senha-descartavel'" # scan-allow: credencial efêmera
+          sudo -u postgres createdb -O ci petsystem_test
+      - run: pnpm exec turbo run lint typecheck test build
+      - name: Testes e2e da API
+        run: pnpm --filter @petsystem/api test:e2e
+      - run: bash scripts/security-scan.sh
+
+  secrets:
+    name: segredos no histórico
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
